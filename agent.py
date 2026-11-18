@@ -14,7 +14,7 @@ def detecter_signaux(email: str) -> list[str]:
                     if not unicodedata.combining(c))
     regles = {
         "incident_bloquant": r"\bbloquant\b|impossible de se connecter|\bcannot log ?in\b|\bblocking incident\b|\bservice down\b",
-        "litige_facturation": r"ecart de montant|prelev\w* (?:en )?double|preleves deux fois|rembours\w*|\bavoir\b|\bdouble charg\w*|\brefund\w*|billing dispute",
+        "litige_facturation": r"ecart de montant|prelev\w* (?:en )?double|preleves deux fois|rembours\w*|\b(?:un|cet) avoir\b|\bdouble charg\w*|\brefund\w*|billing dispute|credit note",
         "appel_offres": r"appel d.offres|\brfp\b|request for proposal|\btender\b",
     }
     return [signal for signal, motif in regles.items() if re.search(motif, texte)]

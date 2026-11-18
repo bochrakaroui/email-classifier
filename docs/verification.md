@@ -30,7 +30,13 @@ Après correction : 23 tests réussis. Trois tests supplémentaires ont ensuite 
 ajoutés pour le code de retour d'un lot partiel, le retrait d'un ancien brouillon
 après échec et la protection d'un fichier non géré. Nouvelle passe : **26 tests
 réussis** avec le Python système. Analyse statique `ruff check` : aucun problème
-après corrections. Le relevé final dans le venv sera ajouté ci-dessous.
+après corrections.
+
+Installation isolée : `.venv` créé avec Python 3.14 ; installation effective de
+`requirements.txt` terminée. `pip check` : aucune dépendance cassée. Les versions
+installées correspondent exactement aux versions directes et transitives figées.
+Tests dans ce venv : **26 réussis en 13,13 secondes**. Ces mesures concernent les
+tests simulés et ne constituent pas une mesure de latence du modèle.
 
 Tous les messages des tests sont synthétiques et les réponses Ollama simulées.
 La présence d'une injection dans un message utilisateur est vérifiée comme
@@ -56,6 +62,16 @@ Premier contrôle pendant le téléchargement : exécution sur une copie de
 `email_01.txt`, modèle encore absent. Résultat observé : 0 réussite, 1 échec,
 `type_erreur="modele_indisponible"`, erreur Ollama HTTP 404 enregistrée dans le
 JSON. Ce contrôle vérifie le chemin d'erreur, pas une inférence réussie.
+Le contrôle a ensuite été reproduit dans le venv : code de retour Python **1**,
+bilan 0 réussite / 1 échec, conformément au contrat du CLI.
+
+Relecture de code avant inférence : le signal lexical `avoir` isolé était trop
+large pour « avoir des renseignements ». Il est restreint à `un avoir` / `cet avoir`.
+Un test synthétique de non-régression couvre cette phrase. Les négations et
+citations restent des limites du filet lexical conservateur.
+Après cette correction : **27 tests réussis en 3,98 secondes dans le venv** ;
+analyse statique sans problème. Le code de traitement n'a pas été ajusté à des
+prédictions du modèle à ce stade.
 
 Le téléchargement du candidat exact demandé a été lancé. Les résultats du
 premier appel, du lot complet et de sa revue seront inscrits ici après exécution.

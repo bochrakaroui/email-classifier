@@ -114,3 +114,10 @@ def test_email_injecte_reste_dans_message_utilisateur():
     assert texte not in messages[0]["content"]
     assert json.loads(messages[1]["content"])["email_original"] == texte
     # Ce test vérifie la frontière de messages, pas l'immunité sémantique du LLM.
+
+
+def test_verbe_avoir_ne_declenche_pas_litige():
+    llm, _ = faux_llm(analyse(categorie="question_commerciale"), {"corps": "[TARIFS À CONFIRMER]"})
+    resultat = traiter_email("Je souhaite avoir des renseignements sur vos tarifs.", "synthetique.txt", llm)
+    assert not resultat.a_valider_par_humain
+    assert resultat.cas_sensibles == []

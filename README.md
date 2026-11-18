@@ -120,8 +120,8 @@ Dans Python, `appliquer_regles` garantit l'absence de réponse au spam. Il fusio
 les signaux du modèle avec un filet lexical FR/EN (`detecter_signaux`) : un signal
 impose revue humaine et priorité haute, sauf priorité basse pour le spam. Ce filet
 évite une omission simple même si la catégorie est erronée ; il n'est pas un
-classifieur complet. Une citation, une négation ou un sens différent du mot « avoir »
-peut donner un faux positif. Des paraphrases peuvent être manquées. Tous les
+classifieur complet. Une citation ou une négation peut donner un faux positif.
+Des paraphrases peuvent être manquées. Tous les
 signaux sont conservés dans `cas_sensibles` pour expliquer le routage.
 
 Les prompts isolent l'email dans un message utilisateur JSON et donnent les règles

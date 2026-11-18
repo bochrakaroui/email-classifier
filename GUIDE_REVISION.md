@@ -25,7 +25,7 @@ L'agent vérifie que le texte n'est ni vide ni trop long. `messages_analyse`
 construit deux messages : instructions système et données utilisateur.
 `OllamaLLM.generer` demande une sortie respectant le schéma `Analyse` et la valide.
 Le modèle devrait reconnaître une contestation de facture. Indépendamment de
-cette prédiction, `appliquer_regles` repère « écart de montant » ou « avoir » et
+cette prédiction, `appliquer_regles` repère « écart de montant » ou « un avoir » et
 impose la revue humaine et la priorité haute. Cette détection lexicale ne réécrit
 pas la catégorie prédite : une mauvaise catégorie reste donc mesurable.
 
@@ -140,7 +140,7 @@ Python contrôle ce qui doit être garanti : un spam n'a jamais de brouillon,
 les signaux sensibles imposent une revue, les noms de fichiers viennent de
 l'entrée, le lot est stable et les erreurs techniques ne deviennent pas `autre`.
 Les expressions régulières sont un filet indépendant du modèle, pas une vérité
-sémantique : « nous n'avons pas besoin d'un avoir » peut déclencher une revue
+sémantique : « aucun remboursement demandé » peut déclencher une revue
 excessive. C'est un compromis conservateur à expliquer et à améliorer.
 
 Le modèle traite le sens et rédige. Les règles Python ne cachent pas une table
