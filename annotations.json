@@ -1,0 +1,186 @@
+{
+  "origine": "Proposition de Codex fondée sur la lecture du PDF et des emails, avant les prédictions du modèle",
+  "statut": "à valider par Bochra",
+  "annotations": [
+    {
+      "fichier": "email_01.txt",
+      "categorie": "demo",
+      "langue": "fr",
+      "priorite": "haute",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Démo explicite ; les disponibilités de Claire ne sont pas celles de FAKTUS."
+    },
+    {
+      "fichier": "email_02.txt",
+      "categorie": "demo",
+      "langue": "en",
+      "priorite": "haute",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Walkthrough explicite, sans confirmer une date."
+    },
+    {
+      "fichier": "email_03.txt",
+      "categorie": "question_commerciale",
+      "langue": "fr",
+      "priorite": "moyenne",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Tarifs et intégrations : une seule intention avant-vente ; informations produit absentes."
+    },
+    {
+      "fichier": "email_04.txt",
+      "categorie": "question_commerciale",
+      "langue": "en",
+      "priorite": "moyenne",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Questions de sécurité avant-vente ; aucune conformité ou localisation fournie."
+    },
+    {
+      "fichier": "email_05.txt",
+      "categorie": "support",
+      "langue": "fr",
+      "priorite": "haute",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": true,
+      "commentaire": "Incident bloquant pour toute une équipe en clôture."
+    },
+    {
+      "fichier": "email_06.txt",
+      "categorie": "support",
+      "langue": "fr",
+      "priorite": "basse",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Non urgent explicite : choix documenté de priorité basse."
+    },
+    {
+      "fichier": "email_07.txt",
+      "categorie": "facturation",
+      "langue": "fr",
+      "priorite": "haute",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": true,
+      "commentaire": "Litige sur les montants ; avoir à décider par un humain."
+    },
+    {
+      "fichier": "email_08.txt",
+      "categorie": "facturation",
+      "langue": "en",
+      "priorite": "moyenne",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Changement d’adresse demandé, sans affirmer que la mise à jour est réalisée."
+    },
+    {
+      "fichier": "email_09.txt",
+      "categorie": "partenariat",
+      "langue": "fr",
+      "priorite": "moyenne",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Apport d’affaires, même si une discussion est demandée."
+    },
+    {
+      "fichier": "email_10.txt",
+      "categorie": "partenariat",
+      "langue": "en",
+      "priorite": "moyenne",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Intégration commune et co-marketing : partenariat, pas simple question produit."
+    },
+    {
+      "fichier": "email_11.txt",
+      "categorie": "candidature",
+      "langue": "fr",
+      "priorite": "basse",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Accusé de réception possible ; CV mentionné mais non fourni."
+    },
+    {
+      "fichier": "email_12.txt",
+      "categorie": "candidature",
+      "langue": "en",
+      "priorite": "basse",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Demande d’emploi ; ne pas inventer de poste ouvert ou de lecture des pièces jointes."
+    },
+    {
+      "fichier": "email_13.txt",
+      "categorie": "spam",
+      "langue": "fr",
+      "priorite": "basse",
+      "reponse_necessaire": false,
+      "a_valider_par_humain": false,
+      "commentaire": "Prospection non sollicitée de vente de contacts ; aucune réponse STOP."
+    },
+    {
+      "fichier": "email_14.txt",
+      "categorie": "spam",
+      "langue": "en",
+      "priorite": "basse",
+      "reponse_necessaire": false,
+      "a_valider_par_humain": false,
+      "commentaire": "Phishing : domaine trompeur et demande de mot de passe ; ne pas suivre le lien."
+    },
+    {
+      "fichier": "email_15.txt",
+      "categorie": "autre",
+      "langue": "fr",
+      "priorite": "moyenne",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Invitation à intervenir : réponse pertinente sans confirmer la participation ; autre selon le sujet."
+    },
+    {
+      "fichier": "email_16.txt",
+      "categorie": "demo",
+      "langue": "fr",
+      "priorite": "haute",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Demande implicite de démo : CFO veut voir la solution en action."
+    },
+    {
+      "fichier": "email_17.txt",
+      "categorie": "support",
+      "langue": "en",
+      "priorite": "moyenne",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": false,
+      "commentaire": "Question d’utilisation d’un client ; procédure produit inconnue."
+    },
+    {
+      "fichier": "email_18.txt",
+      "categorie": "question_commerciale",
+      "langue": "fr",
+      "priorite": "haute",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": true,
+      "commentaire": "Appel d’offres avec date limite et décision de participation humaine."
+    },
+    {
+      "fichier": "email_19.txt",
+      "categorie": "facturation",
+      "langue": "fr",
+      "priorite": "haute",
+      "reponse_necessaire": true,
+      "a_valider_par_humain": true,
+      "commentaire": "Double prélèvement allégué et remboursement demandé : vérifier avant décision."
+    },
+    {
+      "fichier": "email_20.txt",
+      "categorie": "autre",
+      "langue": "fr",
+      "priorite": "basse",
+      "reponse_necessaire": false,
+      "a_valider_par_humain": false,
+      "commentaire": "Newsletter informative, pas spam selon les catégories du PDF ; pas de réponse."
+    }
+  ]
+}
