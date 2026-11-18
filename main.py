@@ -129,6 +129,7 @@ def main(argv=None) -> int:
             "secondes": round(time.perf_counter() - debut, 3),
             "reussites": len(resultats) - echecs, "echecs": echecs, "appels": llm.appels,
             "entrees_sha256": {p.name: empreinte_fichier(p) for p in paths},
+            "prompts_sha256": empreinte_fichier(Path(__file__).with_name("prompts.py")),
         }
         enregistrer_sorties(args.output, resultats, execution)
         print(f"Bilan : {len(resultats) - echecs} réussite(s), {echecs} échec(s).")
