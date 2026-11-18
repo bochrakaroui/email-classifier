@@ -1,0 +1,12 @@
+From: Security Team <no-reply@micros0ft-account-verify.com>
+To: contact@faktus.eu
+Date: 2026-11-13 04:40
+Subject: Your account will be suspended
+
+Dear user,
+
+We detected unusual activity on your account. Please verify your password within 24 hours by clicking the link below or your account will be permanently suspended.
+
+http://micros0ft-account-verify.com/login
+
+Microsoft Security Team

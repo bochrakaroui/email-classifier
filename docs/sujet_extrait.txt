@@ -1,0 +1,158 @@
+Faktus – Test technique Stage Data Scientist / AI Engineer (GTM) – Document confidentiel
+1
+FAKTUS · PÔLE GO TO MARKET
+Test technique : agent IA de tri et de
+réponse aux emails
+Stage Data Scientist / AI Engineer
+Durée estimée
+4 à 6 heures de travail effectif
+Délai de rendu
+5 jours ouvrés après réception du sujet
+Fourni avec ce sujet
+emails_test_technique.zip : 20 emails d'exemple au format .txt
+Rendu
+Lien vers un dépôt Git (GitHub ou GitLab, public ou partagé avec nous)
+1. Contexte
+L'équipe GTM de Faktus reçoit chaque jour des emails très variés : demandes de démo, questions
+commerciales, tickets de support, sujets de facturation, propositions de partenariat, candidatures, mais
+aussi beaucoup de bruit (spam, newsletters). Trier ces emails et y répondre prend du temps, et un
+email important traité trop tard peut coûter une opportunité.
+L'objectif de ce test est de construire un petit agent IA capable de classer ces emails et de proposer
+un brouillon de réponse pour chacun. Nous cherchons une solution simple qui fonctionne et qui soit bien
+expliquée, pas une solution exhaustive.
+2. Contraintes techniques
+ Choix du modèle libre. Nous recommandons un modèle open source exécuté en local, qui est
+la solution la plus économique (par exemple via Ollama, llama.cpp, LM Studio ou vLLM, avec un
+modèle de type Mistral, Llama, Qwen ou Gemma). Si vous disposez de crédits sur une API de LLM
+(OpenAI, Anthropic, Mistral, Gemini…), vous pouvez aussi l'utiliser. Indiquez votre choix et sa raison
+dans le README.
+ Si vous choisissez un modèle local, il doit tourner sur un ordinateur portable standard. Un petit
+modèle bien utilisé vaut mieux qu'un gros modèle impossible à lancer.
+ Si vous utilisez une API, ne commitez jamais votre clé dans le dépôt : utilisez par exemple un
+fichier .env non versionné.
+ Langage : Python de préférence. Le choix du framework est libre (LangChain, LlamaIndex,
+smolagents, Pydantic AI…, ou aucun framework).
+ Les emails sont en français et en anglais. La solution doit gérer les deux langues.
+ Les assistants de code IA sont autorisés, mais vous devez être capable d'expliquer chaque partie du
+code pendant le débrief.
+
+
+Faktus – Test technique Stage Data Scientist / AI Engineer (GTM) – Document confidentiel
+2
+3. Travail demandé
+Partie 1 : classification
+Pour chaque fichier du dossier emails/, l'agent attribue une seule catégorie parmi la liste suivante :
+Catégorie
+Description
+demo
+Prospect qui demande une démo, un rendez-vous ou une présentation de la
+solution
+question_commerciale
+Question avant-vente : tarifs, fonctionnalités, intégrations, sécurité, appel d'offres
+support
+Client existant qui rencontre un problème ou qui a une question d'utilisation
+facturation
+Facture, paiement, remboursement, informations de facturation
+partenariat
+Proposition de partenariat, d'intégration ou d'apport d'affaires
+candidature
+Candidature spontanée ou réponse à une offre d'emploi
+spam
+Prospection non sollicitée, arnaque, phishing
+autre
+Tout le reste (newsletters, invitations à des événements, etc.)
+Pour chaque email, l'agent produit également :
+ une priorité (haute, moyenne ou basse) ;
+ un résumé de l'email en une phrase ;
+ une courte justification du choix de catégorie ;
+ la langue détectée.
+Partie 2 : proposition de réponse
+ L'agent rédige un brouillon de réponse pour chaque email qui le justifie, dans la langue de
+l'email reçu et sur un ton professionnel.
+ Les emails classés spam ne reçoivent pas de réponse.
+ L'agent ne doit pas inventer d'informations (prix, délais, fonctionnalités, disponibilités).
+Lorsqu'une information manque, il utilise un champ à compléter, par exemple [CRÉNEAUX À
+PROPOSER].
+ Les cas sensibles (incident bloquant, litige de facturation, appel d'offres…) sont signalés pour une
+revue humaine, par exemple avec un champ a_valider_par_humain: true.
+Partie 3 : exécution et sorties
+La solution doit pouvoir se lancer en une commande, par exemple :
+python main.py --input emails/ --output outputs/
+Elle produit au minimum :
+ un fichier outputs/resultats.json (ou .csv) avec, pour chaque email : fichier, catégorie, priorité,
+langue, résumé, justification, validation humaine requise (oui/non) ;
+ un dossier outputs/reponses/ qui contient un brouillon de réponse par email
+(email_01_reponse.txt, etc.).
+Exemple de format attendu pour un email :
+{
+  "fichier": "email_01.txt",
+  "categorie": "demo",
+  "priorite": "haute",
+  "langue": "fr",
+  "resume": "La DAF de Logisud demande une démo la semaine prochaine.",
+  "justification": "Demande explicite de démonstration par un prospect.",
+  "a_valider_par_humain": false
+}
+
+
+Faktus – Test technique Stage Data Scientist / AI Engineer (GTM) – Document confidentiel
+3
+4. Bonus (facultatif)
+Les bonus ne sont pas obligatoires. Une base solide sans bonus vaut mieux que beaucoup de bonus
+fragiles.
+Bonus
+Attendu
+Connexion à une boîte
+mail réelle (bonus
+principal)
+L'agent se connecte à Gmail (API Gmail avec OAuth) ou à une autre boîte via IMAP.
+Il lit les emails non lus, les classe, applique un libellé correspondant à la catégorie
+et crée un brouillon de réponse dans la boîte. Il n'envoie aucun email
+automatiquement : un humain garde la main sur l'envoi. Utilisez un compte de
+test créé pour l'occasion, jamais une boîte personnelle ou professionnelle réelle.
+Évaluation
+Un petit script qui mesure la qualité de la classification (exactitude, matrice de
+confusion) à partir d'un étiquetage manuel que vous aurez réalisé.
+Interface
+Une interface simple (Streamlit, Gradio…) pour charger des emails, voir la
+classification et modifier les brouillons.
+Industrialisation
+Tests unitaires, Dockerfile, gestion des erreurs (sortie du modèle invalide, email
+vide, etc.).
+5. Livrables
+ Un dépôt Git avec le code et un historique de commits lisible.
+ Un README qui contient : l'installation et le lancement, le modèle choisi et pourquoi, l'architecture
+de l'agent (un schéma simple est bienvenu), les limites connues et ce que vous amélioreriez avec
+plus de temps.
+ Les sorties générées sur les 20 emails fournis (dossier outputs/).
+ Facultatif : une courte vidéo de démonstration (2 à 3 minutes).
+Le rendu sera suivi d'un débrief de 30 minutes : 10 minutes de présentation de votre solution, puis
+20 minutes de questions sur vos choix techniques.
+6. Critères d'évaluation
+Critère
+Ce que nous regardons
+Poids
+Fonctionnement et qualité
+des résultats
+La solution se lance sans difficulté. Les classifications sont
+pertinentes et les réponses utilisables, sans informations inventées.
+30 %
+Qualité du code et
+architecture
+Code lisible et structuré, sorties du modèle structurées et validées,
+prompts propres.
+25 %
+Choix techniques
+Choix du modèle, du framework et du prompting justifiés,
+compromis compris.
+15 %
+Clarté et communication
+README clair et présentation structurée lors du débrief.
+15 %
+Bonus
+Qualité des bonus réalisés, en particulier la connexion à une boîte
+mail.
+15 %
+7. Questions
+En cas de question sur le sujet, contactez Fares Soltani. Une hypothèse raisonnable, documentée dans
+le README, est tout à fait acceptable. Bon courage !

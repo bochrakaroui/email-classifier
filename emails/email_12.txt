@@ -1,0 +1,12 @@
+From: Elena Popescu <elena.popescu.dev@outlook.com>
+To: jobs@faktus.eu
+Date: 2026-11-13 07:55
+Subject: Application – Backend Engineer
+
+Dear hiring team,
+
+I'm a backend engineer with 4 years of experience in Python and PostgreSQL, currently based in Lyon. I'd love to hear if you have any open positions in your tech team.
+My CV and GitHub are attached.
+
+Best regards,
+Elena Popescu

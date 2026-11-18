@@ -1,0 +1,12 @@
+From: Sophie Marchand <s.marchand@atelier-verde.com>
+To: contact@faktus.eu
+Date: 2026-11-10 10:05
+Subject: Tarifs et intégrations
+
+Bonjour,
+
+Avant d'aller plus loin, pourriez-vous m'indiquer vos grilles tarifaires ? Nous sommes une PME de 40 personnes.
+Je voudrais aussi savoir si votre outil s'intègre avec Pennylane et Sage.
+
+Merci d'avance,
+Sophie Marchand

@@ -1,0 +1,11 @@
+From: Lukas Becker <lukas.becker@hanse-digital.de>
+To: sales@faktus.eu
+Date: 2026-11-10 16:30
+Subject: Question about data hosting
+
+Hello,
+
+We are evaluating your platform. Our compliance team needs to know where customer data is hosted and whether you are GDPR compliant. Do you have a security documentation or a DPA you could share?
+
+Thanks,
+Lukas

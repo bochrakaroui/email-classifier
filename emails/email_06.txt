@@ -1,0 +1,11 @@
+From: Inès Haddad <ines.haddad@bloomr.io>
+To: support@faktus.eu
+Date: 2026-11-11 11:40
+Subject: Export CSV incomplet
+
+Bonjour,
+
+Quand j'exporte la liste des factures en CSV, la colonne "date d'échéance" est vide pour certaines lignes alors qu'elle est bien renseignée dans l'interface. Ce n'est pas urgent mais c'est gênant pour nos reportings.
+
+Merci,
+Inès

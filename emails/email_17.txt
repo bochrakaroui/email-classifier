@@ -1,0 +1,11 @@
+From: Oliver Grant <o.grant@brightlane.co.uk>
+To: support@faktus.eu
+Date: 2026-11-14 09:33
+Subject: How do I add a new user?
+
+Hi,
+
+We just hired a new accountant. I can't find where to add a new user to our workspace in the settings. Could you point me in the right direction?
+
+Thanks,
+Oliver
