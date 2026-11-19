@@ -123,6 +123,11 @@ Les règles sémantiques sont dans `prompts.py` :
 | Langue bilingue | Langue de la demande principale ; à égalité, première demande actionnable. Les sorties linguistiques sont limitées à `fr` et `en`. |
 | Revue humaine | Incident bloquant, litige, appel d'offres ou ambiguïté réelle détectée par le modèle. |
 
+La règle bilingue est une consigne au modèle, pas une garantie : l'essai réel
+`Bonjour / Hello` suivi d'une demande anglaise a été détecté à tort en français.
+Les 20 emails fournis sont unilingues. Ce défaut hors corpus reste une limite
+connue et exige une vérification de langue ; voir `docs/robustesse_reelle.json`.
+
 Le PDF donne un exemple de démo en priorité haute sans définir une politique
 complète. Nous généralisons ce choix aux trois demandes de démo. La priorité basse
 du support explicitement non urgent (`email_06`) et des candidatures est une
@@ -242,6 +247,15 @@ pas la généralisation. La qualité des brouillons est évaluée séparément a
 prompts sont consignés dans `docs/verification.md`.
 
 ## Lecture du code et suite
+
+Résultats réellement obtenus avec la version livrée : **20 succès / 0 échec,
+17 brouillons, 39 appels, 1 007,722 s sur CPU**. Exactitude de classification,
+macro F1 et couverture : **1,00** sur la référence proposée. Aucun écart sur les
+décisions annotées, aucun faux négatif/positif de revue sensible. Les deux reprises
+de validation (`06`, `16`) ont réussi au second essai. Tests finaux : **32 réussis**.
+Ce sont des résultats de développement **à valider par Bochra**, pas une mesure
+de généralisation ni une note de qualité des résumés. Des imprécisions narratives
+subsistent ; voir `docs/revue_assistant.md`. La grille humaine reste à remplir.
 
 Le guide détaillé, le parcours d'un email et les questions de débrief sont dans
 [GUIDE_REVISION.md](GUIDE_REVISION.md). Les tests sont simulés et n'exigent pas

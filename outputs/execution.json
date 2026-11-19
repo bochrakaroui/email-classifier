@@ -1,0 +1,354 @@
+{
+  "date_utc": "2026-11-19T00:55:30.839186+00:00",
+  "modele": "qwen3:4b-instruct-2507-q4_K_M",
+  "host": "http://localhost:11434",
+  "options": {
+    "temperature": 0,
+    "seed": 42,
+    "num_ctx": 4096,
+    "num_predict": 900
+  },
+  "timeout_secondes": 180,
+  "secondes": 1007.722,
+  "reussites": 20,
+  "echecs": 0,
+  "appels": [
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 26.256,
+      "eval_count": 131,
+      "eval_duration_ns": 18315981000,
+      "load_duration_ns": 12441100
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 34.573,
+      "eval_count": 79,
+      "eval_duration_ns": 12695852000,
+      "load_duration_ns": 22100900
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 25.853,
+      "eval_count": 150,
+      "eval_duration_ns": 20642230000,
+      "load_duration_ns": 23146900
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 28.54,
+      "eval_count": 63,
+      "eval_duration_ns": 8403233000,
+      "load_duration_ns": 13993300
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 25.917,
+      "eval_count": 142,
+      "eval_duration_ns": 20947822000,
+      "load_duration_ns": 14156900
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 34.529,
+      "eval_count": 60,
+      "eval_duration_ns": 8410594999,
+      "load_duration_ns": 13177000
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 20.189,
+      "eval_count": 118,
+      "eval_duration_ns": 16131362000,
+      "load_duration_ns": 13996000
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 22.641,
+      "eval_count": 53,
+      "eval_duration_ns": 7340981000,
+      "load_duration_ns": 19254300
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 29.916,
+      "eval_count": 173,
+      "eval_duration_ns": 24811291000,
+      "load_duration_ns": 13287900
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 39.406,
+      "eval_count": 100,
+      "eval_duration_ns": 14883038000,
+      "load_duration_ns": 14985800
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 32.321,
+      "eval_count": 187,
+      "eval_duration_ns": 27455260000,
+      "load_duration_ns": 23312700
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 2,
+      "secondes": 31.094,
+      "eval_count": 164,
+      "eval_duration_ns": 25859085000,
+      "load_duration_ns": 13140000
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 28.714,
+      "eval_count": 51,
+      "eval_duration_ns": 6347311000,
+      "load_duration_ns": 20045000
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 36.263,
+      "eval_count": 212,
+      "eval_duration_ns": 30720895000,
+      "load_duration_ns": 10301300
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 35.242,
+      "eval_count": 85,
+      "eval_duration_ns": 10636827000,
+      "load_duration_ns": 18499800
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 20.083,
+      "eval_count": 115,
+      "eval_duration_ns": 15773537000,
+      "load_duration_ns": 16180300
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 22.73,
+      "eval_count": 46,
+      "eval_duration_ns": 5760271000,
+      "load_duration_ns": 14524500
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 23.982,
+      "eval_count": 138,
+      "eval_duration_ns": 18709844000,
+      "load_duration_ns": 12567500
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 29.505,
+      "eval_count": 65,
+      "eval_duration_ns": 8576324000,
+      "load_duration_ns": 17195600
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 22.305,
+      "eval_count": 127,
+      "eval_duration_ns": 17213420000,
+      "load_duration_ns": 17412600
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 24.049,
+      "eval_count": 49,
+      "eval_duration_ns": 6296174000,
+      "load_duration_ns": 9023600
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 23.027,
+      "eval_count": 128,
+      "eval_duration_ns": 18545200000,
+      "load_duration_ns": 12140100
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 25.952,
+      "eval_count": 58,
+      "eval_duration_ns": 7244456000,
+      "load_duration_ns": 13197700
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 26.42,
+      "eval_count": 154,
+      "eval_duration_ns": 22110217000,
+      "load_duration_ns": 10429100
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 23.959,
+      "eval_count": 49,
+      "eval_duration_ns": 6088326000,
+      "load_duration_ns": 15583600
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 26.889,
+      "eval_count": 142,
+      "eval_duration_ns": 21355840000,
+      "load_duration_ns": 17284100
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 24.402,
+      "eval_count": 149,
+      "eval_duration_ns": 20407085000,
+      "load_duration_ns": 11972900
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 22.263,
+      "eval_count": 115,
+      "eval_duration_ns": 17281441000,
+      "load_duration_ns": 10616300
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 9.169,
+      "eval_count": 64,
+      "eval_duration_ns": 8062456000,
+      "load_duration_ns": 18525400
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 25.486,
+      "eval_count": 152,
+      "eval_duration_ns": 20622714000,
+      "load_duration_ns": 16206100
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 2,
+      "secondes": 25.825,
+      "eval_count": 141,
+      "eval_duration_ns": 20700550000,
+      "load_duration_ns": 13633300
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 23.779,
+      "eval_count": 79,
+      "eval_duration_ns": 10526443000,
+      "load_duration_ns": 13275600
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 21.626,
+      "eval_count": 131,
+      "eval_duration_ns": 17763844000,
+      "load_duration_ns": 14524600
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 19.683,
+      "eval_count": 41,
+      "eval_duration_ns": 5360977000,
+      "load_duration_ns": 13463100
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 29.72,
+      "eval_count": 167,
+      "eval_duration_ns": 23935839000,
+      "load_duration_ns": 11649100
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 8.984,
+      "eval_count": 67,
+      "eval_duration_ns": 8291317999,
+      "load_duration_ns": 15082400
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 27.25,
+      "eval_count": 158,
+      "eval_duration_ns": 22918991000,
+      "load_duration_ns": 12787300
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 24.774,
+      "eval_count": 85,
+      "eval_duration_ns": 11601509000,
+      "load_duration_ns": 19450600
+    },
+    {
+      "schema": "Analyse",
+      "tentative": 1,
+      "secondes": 24.309,
+      "eval_count": 119,
+      "eval_duration_ns": 19407761000,
+      "load_duration_ns": 20657400
+    }
+  ],
+  "entrees_sha256": {
+    "email_01.txt": "f0d211ccaaf9b9a21999bdfdb85b39fbf7707208459ca2f1c7537fc6500bbf5d",
+    "email_02.txt": "09e8ac378428debd044deeac116ca7ad48440a49e9cb9a7573f903826397ec63",
+    "email_03.txt": "33260472367418b6dd1baca0f10c85b83e08d752892c7f387ae46f45b9993758",
+    "email_04.txt": "6774b0e61341a3ca21f284255540b44b5762782161fb141868db65dcb3f85b1f",
+    "email_05.txt": "877babfd7063382e5c0d89b171fac25efab255b129e16932357c158af2c2be76",
+    "email_06.txt": "eb45c0c201f848cd21a04a576533dd9be7a4e7b6f917fe30f5640538f68a5472",
+    "email_07.txt": "768c7c9f5a8c81fa37ff06b0ac8e260e4b420df45c956067498c5c1d2da80a43",
+    "email_08.txt": "3ca658982fd5cb99789eaaae45d715088580ede42223499fd439375a0298ba26",
+    "email_09.txt": "9e7d80b5bdc5b27d0a2565638379e6e5ce44303050703855c18dadf18b635c21",
+    "email_10.txt": "a926665171d887fc9e5d72a1a6fbb9d14c389b282984b8d7f170c92ef6ea55ea",
+    "email_11.txt": "15fd27f620cfb8361126aeef61a29ba30b07049c5a7ec0523264cc48f19cdfc0",
+    "email_12.txt": "779df7b1b1a631f38f8bddd2d40a221c244becb80433a2f9213a8615befc9941",
+    "email_13.txt": "728826094c0e44edcfd19c2baad65e82e8383a9bb8810b56f9c8351dd7c5a5fb",
+    "email_14.txt": "0315a645ac5d51bdb89f0da84435c5a9f775e1cd11de4f194ad61e0162906a55",
+    "email_15.txt": "4fefc4b35fb843ef850e68dcada3ece2a5c427fa20c50045573e836049a92b63",
+    "email_16.txt": "85b3fc1fd4372bd8ba6de8f7e43d6e817cfcec1e74519cbce77453e8f03cfead",
+    "email_17.txt": "71e6dbff0c3ba7fa633aad965c70df89f5d0f2da41e21c0e2f683d1bd92f5d9d",
+    "email_18.txt": "4e813d1c04a00b7b2437f1679b1e8bb87ddb4296646b94da7421f176e704c3d6",
+    "email_19.txt": "2e65cdafc2cd8a298d8fe123eb16ce939046647a1559b8ab421af6f5a5c7e0b3",
+    "email_20.txt": "17f892a47915d3f7aaf201fb2518614d944be9b437885af904b11142ea18a4a3"
+  },
+  "prompts_sha256": "c725066c1eff5de9c41e990ad1000c01d0e9267b8038c3217211ed793963036a",
+  "redaction_sha256": "65637e05eb3beea59596e38222516dd25d92b26fc6e0af52ad3fdb243425ed46",
+  "mode_redaction": "selection_de_formulations_autorisees"
+}

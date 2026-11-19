@@ -110,6 +110,12 @@ Les `Literal` limitent les valeurs admises, par exemple `haute`, `moyenne`, `bas
 `extra="forbid"` rejette une clé non prévue. `Field` borne la longueur des textes.
 `model_validator` de `Resultat` contrôle plusieurs champs ensemble.
 
+Pour le brouillon, `schema_brouillon` utilise `create_model` pour créer une classe
+Pydantic à l'exécution : ses valeurs permises dépendent de la langue et des cas
+sensibles de cet email. `Literal` contient ici les textes complets proposés par
+`redaction.py`, pas seulement une étiquette. Le JSON Schema en fait une `enum`.
+Le modèle doit donc choisir un de ces textes et Pydantic vérifie cette même liste.
+
 Ce contrat vérifie la structure et certains invariants, pas la vérité factuelle,
 la bonne catégorie ni la langue réelle du texte. Le contrôle du résumé est une
 heuristique de ponctuation et non une analyse linguistique : une abréviation peut
@@ -245,6 +251,12 @@ un contenu invalide. Aucune reprise automatique d'une panne réseau.
 à cette petite référence, pour les fichiers effectivement traités. Ce n'est ni une
 certification de qualité rédactionnelle, ni une mesure de généralisation, ni une
 référence validée si son statut reste provisoire.
+
+Dans l'exécution livrée, les 20 fichiers correspondent à la référence proposée,
+mais le cas synthétique bilingue choisit encore la mauvaise langue. Les résumés
+et justifications ont aussi des imprécisions, listées dans `docs/revue_assistant.md`.
+La prose de ces champs reste libre : une validation de structure ne prouve pas
+leur fidélité. Il faut distinguer ce défaut des garanties du catalogue de brouillons.
 
 **Quels tests sont les plus utiles ?** Le spam annoncé à tort comme nécessitant
 une réponse, le signal sensible oublié par le modèle, le lot avec un email vide,
