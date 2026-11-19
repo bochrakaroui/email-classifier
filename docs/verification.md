@@ -152,6 +152,9 @@ le résultat. Tous les exemples ci-dessus font désormais partie du développeme
   humaine sont vérifiés séparément par les tests simulés.
 - Vérifications finales : **32 tests réussis en 4,33 s** dans le venv ; `pip check`
   sans conflit ; `ruff check` et `git diff --check` sans problème.
+- Reproductibilité Git : les emails originaux et brouillons sont marqués `-text`
+  dans `.gitattributes`, afin qu'un checkout Windows ne convertisse pas leurs
+  fins de ligne et n'invalide pas les empreintes du manifeste.
 
 ### Deux contrôles réels hors corpus
 
