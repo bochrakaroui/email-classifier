@@ -11,6 +11,8 @@ from agent import traiter_email
 from llm import ErreurTraitement, OllamaLLM
 from schemas import Analyse
 
+BROUILLON_AUTORISE = object()
+
 
 def analyse(**kwargs):
     base = {"categorie": "support", "priorite": "moyenne", "langue": "fr",
@@ -27,6 +29,9 @@ class FauxClient:
     def chat(self, **kwargs):
         self.appels.append(kwargs)
         reponse = next(self.reponses)
+        if reponse is BROUILLON_AUTORISE:
+            # Le faux modèle choisit une formulation réellement autorisée par le schéma.
+            reponse = json.dumps({"corps": kwargs["format"]["properties"]["corps"]["enum"][0]})
         if isinstance(reponse, Exception):
             raise reponse
         return SimpleNamespace(message=SimpleNamespace(content=reponse),
@@ -71,7 +76,7 @@ def test_spam_ne_declenche_pas_second_appel():
     ("Double charge, please refund.", "litige_facturation"),
 ])
 def test_signal_independant_du_modele(texte, signal):
-    llm, _ = faux_llm(analyse(), {"corps": "Bonjour, [SUITE À CONFIRMER]."})
+    llm, _ = faux_llm(analyse(), BROUILLON_AUTORISE)
     resultat = traiter_email(texte, "synthetique.txt", llm)
     assert resultat.a_valider_par_humain
     assert resultat.priorite == "haute"
@@ -117,7 +122,38 @@ def test_email_injecte_reste_dans_message_utilisateur():
 
 
 def test_verbe_avoir_ne_declenche_pas_litige():
-    llm, _ = faux_llm(analyse(categorie="question_commerciale"), {"corps": "[TARIFS À CONFIRMER]"})
+    llm, _ = faux_llm(analyse(categorie="question_commerciale"), BROUILLON_AUTORISE)
     resultat = traiter_email("Je souhaite avoir des renseignements sur vos tarifs.", "synthetique.txt", llm)
     assert not resultat.a_valider_par_humain
     assert resultat.cas_sensibles == []
+
+
+def test_resume_deux_phrases_rejete_puis_corrige():
+    llm, client = faux_llm(analyse(resume="Une demande arrive. Elle est urgente."),
+                           analyse(reponse_necessaire=False))
+    resultat = traiter_email("Information", "synthetique.txt", llm)
+    assert resultat.resume == "Un client demande de l'aide."
+    assert len(client.appels) == 2
+
+
+@pytest.mark.parametrize("categorie,texte", [
+    ("candidature", "Bonjour, voici ma candidature."),
+    ("support", "Mon export est incomplet mais ce n'est pas urgent."),
+])
+def test_priorite_basse_selon_politique(categorie, texte):
+    llm, _ = faux_llm(analyse(categorie=categorie, priorite="moyenne"), BROUILLON_AUTORISE)
+    assert traiter_email(texte, "synthetique.txt", llm).priorite == "basse"
+
+
+def test_affirmation_libre_refusee_meme_si_json_valide():
+    mauvais = {"corps": "We confirm our GDPR compliance and your refund."}
+    llm, _ = faux_llm(analyse(), mauvais, mauvais)
+    with pytest.raises(ErreurTraitement) as erreur:
+        traiter_email("Question", "synthetique.txt", llm)
+    assert erreur.value.code == "sortie_invalide"
+    assert erreur.value.analyse is not None
+
+
+def test_priorite_commerciale_non_sensible_corrigee():
+    llm, _ = faux_llm(analyse(categorie="question_commerciale", priorite="haute"), BROUILLON_AUTORISE)
+    assert traiter_email("Question sur l'hébergement", "synthetique.txt", llm).priorite == "moyenne"

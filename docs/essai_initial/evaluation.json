@@ -1,0 +1,202 @@
+{
+  "statut_reference": "à valider par Bochra",
+  "origine_reference": "Proposition de Codex fondée sur la lecture du PDF et des emails, avant les prédictions du modèle",
+  "nombre_reference": 20,
+  "nombre_predictions": 20,
+  "nombre_evalues": 20,
+  "couverture": 1.0,
+  "predictions_manquantes": [],
+  "predictions_sans_reference": [],
+  "echecs_techniques": [],
+  "exactitude": 0.95,
+  "corrects_sur_reference_totale": 0.95,
+  "categories_matrice": [
+    "demo",
+    "question_commerciale",
+    "support",
+    "facturation",
+    "partenariat",
+    "candidature",
+    "spam",
+    "autre"
+  ],
+  "matrice_confusion": [
+    [
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      2,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2
+    ]
+  ],
+  "rapport_par_categorie": {
+    "demo": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 3.0
+    },
+    "question_commerciale": {
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "f1-score": 0.8,
+      "support": 3.0
+    },
+    "support": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 3.0
+    },
+    "facturation": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 3.0
+    },
+    "partenariat": {
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "f1-score": 0.8,
+      "support": 2.0
+    },
+    "candidature": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "spam": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "autre": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    }
+  },
+  "macro_f1": 0.95,
+  "erreurs_champs": {
+    "categorie": [
+      {
+        "fichier": "email_18.txt",
+        "attendu": "question_commerciale",
+        "predit": "partenariat"
+      }
+    ],
+    "langue": [],
+    "priorite": [
+      {
+        "fichier": "email_06.txt",
+        "attendu": "basse",
+        "predit": "moyenne"
+      },
+      {
+        "fichier": "email_11.txt",
+        "attendu": "basse",
+        "predit": "moyenne"
+      },
+      {
+        "fichier": "email_12.txt",
+        "attendu": "basse",
+        "predit": "moyenne"
+      },
+      {
+        "fichier": "email_15.txt",
+        "attendu": "moyenne",
+        "predit": "basse"
+      }
+    ],
+    "reponse_necessaire": [
+      {
+        "fichier": "email_15.txt",
+        "attendu": true,
+        "predit": false
+      }
+    ],
+    "a_valider_par_humain": []
+  },
+  "sensibles": {
+    "faux_negatifs": [],
+    "faux_positifs": [],
+    "non_evalues": []
+  },
+  "limites": "Scores provisoires si référence non validée ; petit lot de développement, pas de mesure de généralisation ni de qualité rédactionnelle. Matrice : lignes=référence, colonnes=prédiction. Les échecs sont exclus des scores conditionnels et restent visibles dans la couverture."
+}

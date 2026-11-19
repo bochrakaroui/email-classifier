@@ -5,7 +5,8 @@ import unicodedata
 
 from llm import ErreurTraitement
 from prompts import messages_analyse, messages_brouillon
-from schemas import Analyse, Brouillon, Resultat
+from redaction import propositions_brouillons
+from schemas import Analyse, Resultat, schema_brouillon
 
 
 def detecter_signaux(email: str) -> list[str]:
@@ -22,13 +23,21 @@ def detecter_signaux(email: str) -> list[str]:
 
 def appliquer_regles(email: str, analyse: Analyse) -> Analyse:
     donnees = analyse.model_dump()
+    support_non_urgent = analyse.categorie == "support" and bool(
+        re.search(r"pas urgent|not urgent|non.urgent", email, re.IGNORECASE)
+    )
     donnees["cas_sensibles"] = sorted(set(analyse.cas_sensibles) | set(detecter_signaux(email)))
     if donnees["cas_sensibles"]:
         donnees["a_valider_par_humain"] = True
-        donnees["priorite"] = "haute"
     if analyse.categorie == "spam":
         donnees["reponse_necessaire"] = False
         donnees["priorite"] = "basse"
+    elif donnees["cas_sensibles"] or analyse.categorie == "demo":
+        donnees["priorite"] = "haute"
+    elif analyse.categorie == "candidature" or not analyse.reponse_necessaire or support_non_urgent:
+        donnees["priorite"] = "basse"
+    else:
+        donnees["priorite"] = "moyenne"
     return Analyse.model_validate(donnees)
 
 
@@ -42,7 +51,9 @@ def traiter_email(email: str, fichier: str, llm) -> Resultat:
     brouillon = None
     if analyse.reponse_necessaire:
         try:
-            brouillon = llm.generer(messages_brouillon(email, analyse), Brouillon).corps
+            textes = propositions_brouillons(analyse)
+            schema = schema_brouillon(textes)
+            brouillon = llm.generer(messages_brouillon(email, analyse, textes), schema).corps
         except ErreurTraitement as exc:
             exc.analyse = analyse
             raise

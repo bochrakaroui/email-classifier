@@ -1,8 +1,16 @@
 """Contrats partagés entre le modèle, l'agent, les fichiers et l'évaluation."""
 
+import re
 from typing import Literal, Self, get_args
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    create_model,
+    field_validator,
+    model_validator,
+)
 
 Categorie = Literal[
     "demo", "question_commerciale", "support", "facturation",
@@ -21,15 +29,28 @@ class Analyse(StrictModel):
     categorie: Categorie
     priorite: Priorite
     langue: Literal["fr", "en"]
-    resume: str = Field(min_length=1, max_length=500)
+    resume: str = Field(min_length=1, max_length=350)
     justification: str = Field(min_length=1, max_length=400)
     reponse_necessaire: bool
     a_valider_par_humain: bool
     cas_sensibles: list[Signal]
 
+    @field_validator("resume")
+    @classmethod
+    def verifier_phrase_unique(cls, texte: str) -> str:
+        if "\n" in texte or len([p for p in re.split(r"[.!?](?:\s+|$)", texte) if p.strip()]) > 1:
+            raise ValueError("Le résumé doit tenir en une seule phrase, sans seconde explication")
+        return texte
+
 
 class Brouillon(StrictModel):
     corps: str = Field(min_length=1, max_length=4000)
+
+
+def schema_brouillon(textes_autorises: list[str]) -> type[Brouillon]:
+    """L'enum contraint aussi le texte : le modèle ne peut ajouter une affirmation."""
+    return create_model("BrouillonContraint", __base__=Brouillon,
+                        corps=(Literal[tuple(textes_autorises)], ...))
 
 
 class Resultat(Analyse):

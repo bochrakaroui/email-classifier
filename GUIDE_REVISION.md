@@ -7,7 +7,7 @@ expliquer son comportement à voix haute est un bon rythme de révision.
 
 1. `README.md`, le PDF et `emails/email_01.txt` : objectif, contraintes, exemple brut.
 2. `schemas.py` : les contrats qui décrivent les entrées/sorties des étapes.
-3. `prompts.py` : règles sémantiques de tri et de rédaction.
+3. `redaction.py`, puis `prompts.py` : formulations prudentes et consignes du modèle.
 4. `llm.py` : l'appel au modèle et la validation de sa réponse.
 5. `agent.py` : le parcours central d'un email et ses invariants.
 6. `main.py` : le lot, les fichiers, les sorties et les codes de retour.
@@ -29,10 +29,12 @@ cette prédiction, `appliquer_regles` repère « écart de montant » ou « un a
 impose la revue humaine et la priorité haute. Cette détection lexicale ne réécrit
 pas la catégorie prédite : une mauvaise catégorie reste donc mesurable.
 
-Si la réponse est pertinente, `messages_brouillon` joint l'email à cette analyse
-validée. Le même modèle produit un `Brouillon`. Le texte doit décrire les montants
-comme signalés et laisser la décision de correction à confirmer. Le schéma ne
-vérifie pas lui-même que chaque affirmation est étayée.
+Si la réponse est pertinente, `propositions_brouillons` construit des réponses
+prudentes dans la langue de l'analyse. `schema_brouillon` limite le champ `corps`
+à ces textes exacts. `messages_brouillon` joint l'email, l'analyse validée et les
+propositions ; le même modèle en choisit une et la renvoie intégralement.
+Pour le litige, la formulation demande une vérification sans confirmer de montant,
+avoir ou remboursement. Aucun texte libre n'est admis dans cette étape.
 
 `Resultat` ajoute le nom du fichier depuis Python et contrôle la cohérence.
 `enregistrer_sorties` écrit la ligne dans le JSON et le brouillon dans son fichier.
@@ -44,7 +46,10 @@ n'est publié pour cet email. Le lot continue avec le suivant.
 | Élément | Entrées | Sortie et responsabilité |
 |---|---|---|
 | `schemas.Analyse` | JSON du premier appel | Catégorie, priorité, langue, résumé, justification, besoin de réponse/revue et signaux typés. |
+| `schemas.Analyse.verifier_phrase_unique` | Résumé | Refuse une seconde phrase détectée par ponctuation ou un saut de ligne. |
 | `schemas.Brouillon` | JSON du second appel | Texte non vide, de longueur bornée. |
+| `schemas.schema_brouillon` | Liste de textes autorisés | Classe Pydantic temporaire dont le champ `corps` est une enum de ces textes exacts. |
+| `redaction.propositions_brouillons` | Analyse validée | Réponses prudentes en FR/EN, adaptées aux signaux sensibles et à la catégorie. |
 | `schemas.Resultat.verifier_coherence` | Résultat à construire | Refuse spam avec réponse, contradiction réponse/brouillon et signal sensible sans revue. |
 | `schemas.Echec` | Nom, code et message ; analyse facultative | Représentation distincte d'une erreur technique. |
 | `schemas.Annotation` | Ligne de référence | Attend les six décisions métier et un commentaire. |
@@ -82,15 +87,16 @@ et les règles sont des protections, pas une preuve d'immunité.
 et les signaux sensibles. Il demande un résumé français en une phrase et une
 justification courte, pas une longue explication interne.
 
-`BROUILLON_SYSTEM` reçoit l'analyse après correction Python. Il interdit les
-inventions spécifiques au produit, les rendez-vous confirmés, les actions dites
-déjà réalisées et les engagements de remboursement/participation. Il impose des
-champs entre crochets. Aucune documentation approuvée n'est disponible pour
-compléter ces champs automatiquement.
+`messages_brouillon` demande de choisir et recopier exactement l'un des textes
+autorisés. Les textes viennent de `redaction.py`, pas de l'expéditeur. Le schéma
+impose la même liste : ce contrôle ne dépend donc pas du respect d'une simple
+interdiction dans le prompt. Les textes n'affirment ni fonctionnalité, ni rendez-vous,
+ni remboursement, ni participation à un appel d'offres. Les données manquantes
+restent en champs entre crochets, à compléter avec une source approuvée.
 
 `generer` ajoute le schéma au système pour rappeler la structure exacte au modèle.
-La limite de mots est une consigne de rédaction ; la validation automatique borne
-les caractères, pas un comptage de mots ni la pertinence des phrases.
+La version finale n'impose pas de comptage de mots : ses formulations sont courtes
+par construction et restent intégralement soumises à la revue de pertinence.
 
 ## 5. JSON Schema et validation Pydantic
 
@@ -105,8 +111,9 @@ Les `Literal` limitent les valeurs admises, par exemple `haute`, `moyenne`, `bas
 `model_validator` de `Resultat` contrôle plusieurs champs ensemble.
 
 Ce contrat vérifie la structure et certains invariants, pas la vérité factuelle,
-la bonne catégorie, la langue réelle du texte ni le résumé en une phrase au sens
-linguistique. Ces points sont examinés dans l'évaluation et la revue des brouillons.
+la bonne catégorie ni la langue réelle du texte. Le contrôle du résumé est une
+heuristique de ponctuation et non une analyse linguistique : une abréviation peut
+déclencher un refus. La pertinence est examinée dans l'évaluation et la revue.
 
 ## 6. Rôle de l'orchestrateur
 
@@ -117,7 +124,7 @@ sans boucle de décision autonome :
 vérifier le texte
 → analyser avec le modèle
 → appliquer les règles Python
-→ rédiger si nécessaire
+→ proposer des formulations et laisser le modèle en choisir une si nécessaire
 → construire le résultat cohérent
 ```
 
@@ -127,12 +134,16 @@ parcours sans modèle et de réutiliser `traiter_email` dans une future interfac
 
 ## 7. Pourquoi deux appels au même modèle ?
 
-Le premier doit prendre des décisions discrètes et courtes. Le second doit rédiger
-à partir de ces décisions. Les séparer permet de ne pas rédiger pour le spam,
+Le premier doit prendre des décisions discrètes et courtes. Le second choisit
+une réponse complète à partir de ces décisions. Les séparer permet de ne pas rédiger pour le spam,
 d'appliquer les invariants avant la réponse et de distinguer erreur d'analyse
 et erreur de rédaction. Les inconvénients sont la latence et la possibilité que
 le second appel propage une analyse erronée. Le texte original reste fourni
-au second appel pour qu'il puisse reprendre fidèlement les détails disponibles.
+au second appel pour qu'il puisse choisir le thème et la question appropriés.
+Après deux essais libres insuffisants, le texte est fermé par une enum. Cela réduit
+la personnalisation. Le second appel apporte moins de valeur qu'une rédaction
+libre ; il conserve le format à deux appels demandé. Une variante future sans
+cette contrainte pourrait sélectionner ces messages par règles sans modèle.
 
 ## 8. Règles appliquées dans Python
 
@@ -143,7 +154,10 @@ Les expressions régulières sont un filet indépendant du modèle, pas une vér
 sémantique : « aucun remboursement demandé » peut déclencher une revue
 excessive. C'est un compromis conservateur à expliquer et à améliorer.
 
-Le modèle traite le sens et rédige. Les règles Python ne cachent pas une table
+Le modèle traite le sens et choisit une formulation contrôlée. Les règles Python
+recalculent aussi toutes les priorités selon la politique documentée : spam bas,
+cas sensible/démo haut, candidature/sans réponse/support non urgent bas, sinon
+moyen. Ce sont des décisions de l'application après modèle. Elles ne cachent pas une table
 de catégories associées aux 20 noms de fichiers ; les annotations ne sont jamais
 chargées par le programme de traitement.
 
@@ -204,10 +218,12 @@ solution en action » expriment une intention commune de façons différentes.
 Le modèle traite ce sens. Les mots-clés servent seulement à déclencher des revues
 conservatrices sur des signaux importants.
 
-**Que garantissez-vous sur les inventions ?** Des consignes précises, aucun outil
-d'action et des champs à compléter réduisent le risque. Pydantic ne prouve pas
-la vérité d'une phrase ; la revue humaine reste indispensable. Une base produit
-approuvée serait la prochaine amélioration pour étayer les réponses.
+**Que garantissez-vous sur les inventions ?** Dans les brouillons, le modèle peut
+uniquement renvoyer un texte du catalogue prudent de `redaction.py`. L'enum est
+vérifiée dans Python : une phrase libre sur le RGPD ou un remboursement est refusée.
+Cela ne garantit pas la pertinence de la variante choisie ni l'analyse. Les champs
+restent à compléter et la revue humaine demeure nécessaire. Une base produit
+approuvée permettrait ensuite des réponses plus riches et étayées.
 
 **Que se passe-t-il si le modèle retourne un champ de trop ?** Pydantic refuse la
 sortie, l'appel est corrigé une fois, puis l'email devient une erreur si nécessaire.

@@ -3,7 +3,7 @@ import json
 import pytest
 
 from main import enregistrer_sorties, main, traiter_lot
-from tests.test_agent import analyse, faux_llm
+from tests.test_agent import BROUILLON_AUTORISE, analyse, faux_llm
 
 
 def test_erreur_isolee_et_encodage(tmp_path):
@@ -17,7 +17,7 @@ def test_erreur_isolee_et_encodage(tmp_path):
 
 
 def test_relance_supprime_seulement_ancien_brouillon(tmp_path):
-    llm, _ = faux_llm(analyse(), {"corps": "Bonjour, à compléter."})
+    llm, _ = faux_llm(analyse(), BROUILLON_AUTORISE)
     path = tmp_path / "email.txt"
     path.write_text("Question", encoding="utf-8")
     resultats = traiter_lot([path], llm)
@@ -34,7 +34,7 @@ def test_relance_supprime_seulement_ancien_brouillon(tmp_path):
 
 
 def test_brouillon_humain_protege(tmp_path):
-    llm, _ = faux_llm(analyse(), {"corps": "Brouillon initial"})
+    llm, _ = faux_llm(analyse(), BROUILLON_AUTORISE)
     path = tmp_path / "email.txt"
     path.write_text("Question", encoding="utf-8")
     resultats = traiter_lot([path], llm)
@@ -72,7 +72,7 @@ def test_cli_echec_partiel_code_un(tmp_path, monkeypatch):
 
 
 def test_relance_echec_retire_ancien_brouillon(tmp_path):
-    llm, _ = faux_llm(analyse(), {"corps": "À vérifier"})
+    llm, _ = faux_llm(analyse(), BROUILLON_AUTORISE)
     path = tmp_path / "email.txt"
     path.write_text("Question", encoding="utf-8")
     sortie = tmp_path / "out"
@@ -87,7 +87,7 @@ def test_collision_fichier_non_gere_preservee(tmp_path):
     (sortie / "reponses").mkdir(parents=True)
     manuel = sortie / "reponses" / "email_reponse.txt"
     manuel.write_text("Texte humain", encoding="utf-8")
-    llm, _ = faux_llm(analyse(), {"corps": "Génération"})
+    llm, _ = faux_llm(analyse(), BROUILLON_AUTORISE)
     path = tmp_path / "email.txt"
     path.write_text("Question", encoding="utf-8")
     with pytest.raises(ValueError, match="non géré"):

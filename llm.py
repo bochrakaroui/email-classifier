@@ -62,6 +62,7 @@ class OllamaLLM:
                         + "; ".join(e["msg"] for e in exc.errors(include_input=False))[:500],
                     ) from exc
                 conversation.append({"role": "assistant", "content": response.message.content or ""})
+                raisons = "; ".join(e["msg"] for e in exc.errors(include_input=False))[:500]
                 conversation.append({"role": "user", "content":
-                    "La sortie ne respecte pas le schéma. Corrige uniquement le JSON selon le schéma système."})
+                    "La sortie ne respecte pas le schéma. Corrige uniquement le JSON selon le schéma système. " + raisons})
         raise AssertionError("Boucle de reprise terminée sans résultat")

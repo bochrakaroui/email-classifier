@@ -130,6 +130,8 @@ def main(argv=None) -> int:
             "reussites": len(resultats) - echecs, "echecs": echecs, "appels": llm.appels,
             "entrees_sha256": {p.name: empreinte_fichier(p) for p in paths},
             "prompts_sha256": empreinte_fichier(Path(__file__).with_name("prompts.py")),
+            "redaction_sha256": empreinte_fichier(Path(__file__).with_name("redaction.py")),
+            "mode_redaction": "selection_de_formulations_autorisees",
         }
         enregistrer_sorties(args.output, resultats, execution)
         print(f"Bilan : {len(resultats) - echecs} réussite(s), {echecs} échec(s).")
