@@ -173,6 +173,17 @@ restant dans `autre`, avec une priorité basse.
 
 ## 4. Comment fonctionne le traitement ?
 
+```mermaid
+flowchart TD
+    A[Email texte via la commande ou Streamlit] --> B[Appel 1 : analyse avec Ollama]
+    B --> C[Validation Pydantic et règles Python]
+    C --> D{Réponse nécessaire ?}
+    D -->|Oui| E[Appel 2 : choix dans le catalogue de brouillons]
+    E --> F[Validation du brouillon]
+    F --> G[Résultat affiché dans Streamlit ou enregistré par la commande]
+    D -->|Non| G
+```
+
 1. **Lire l’email.** Python extrait l’objet, le corps et le nom affiché de l’expéditeur.
 2. **Analyser avec le modèle.** Les consignes de `prompts.py` lui demandent une
    réponse JSON : catégorie, langue, résumé, justification et besoin de réponse.
@@ -282,12 +293,29 @@ sur CPU**. La suite de tests du code compte **149 tests réussis**.
 Les résultats livrés sont dans [outputs/](outputs/). Le
 [bilan de vérification](docs/verification.md) décrit les essais et leurs limites.
 
+### Limites connues
+
 Les catégories et décisions évaluées correspondent toutes à la référence proposée.
 Cette référence reste **à valider par Bochra**, et les 20 emails constituent un
 petit corpus de développement. Ce résultat ne garantit ni les performances sur
 de nouveaux emails, ni la fidélité de chaque résumé : des formulations imprécises
 restent à relire.
 Le nom et l’entreprise déclarés dans un email ne sont pas authentifiés par l’application.
+
+Le traitement sur CPU reste lent, la détection des emails bilingues est imparfaite
+et le catalogue limite la personnalisation des réponses. Les cas sensibles sont
+signalés pour une revue humaine ; tous les champs à compléter doivent être relus.
+
+### Ce que nous améliorerions avec plus de temps
+
+- **Évaluation :** faire valider les annotations et mesurer les résultats sur
+  un nouveau lot indépendant des emails de développement.
+- **Réponses :** utiliser une documentation produit approuvée pour proposer
+  des brouillons plus personnalisés et étayés.
+- **Robustesse :** élargir les essais sur les messages bilingues, les demandes
+  ambiguës et les instructions malveillantes contenues dans les emails.
+- **Rapidité :** comparer plusieurs modèles et configurations matérielles avec
+  des mesures répétées de qualité et de latence, avant de choisir une optimisation.
 
 ## 6. En cas de problème
 
