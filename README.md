@@ -1,269 +1,332 @@
-# Agent FAKTUS : tri et brouillons d'emails
+# FAKTUS — Agent de tri et de réponse aux emails
 
-Application Python locale : un dossier de `.txt` entre, un JSON et des brouillons
-sortent. Aucun envoi d'email. Les brouillons sont des propositions à relire et à
-compléter. Le périmètre reprend le sujet fourni et les précisions de Bochra.
+Ce projet analyse des emails et prépare des réponses à relire. Pour chaque email,
+il fournit une catégorie, une priorité, un résumé, une justification et, si une
+réponse est nécessaire, un brouillon en français ou en anglais.
 
-## Installation et lancement
+Le traitement utilise un modèle installé sur la machine avec **Ollama**.
+**Aucun email n’est envoyé automatiquement.**
 
-Environnement visé : Python 3.14, Ollama installé, environ 16 Go de RAM et 3 Go de
-disque pour les poids, en plus des dépendances. La machine de développement a
-un Ryzen 5 4600H (6 cœurs / 12 threads), 16 505 847 808 octets de RAM et une
-GTX 1650 Ti (4 Go). Le temps réel d'inférence dépend de la mémoire disponible.
+## 1. Installer le projet sur sa machine
 
-PowerShell, depuis ce dossier :
+### Prérequis
+
+- Installer [Python](https://www.python.org/downloads/) **3.14**, version utilisée pour les essais.
+- Installer [Ollama](https://ollama.com/download).
+- Récupérer le projet, puis ouvrir un terminal dans le dossier `email-classifier`.
+- Prévoir une connexion Internet pour installer les dépendances et télécharger
+  le modèle. Ensuite, le traitement fonctionne localement avec la configuration par défaut.
+
+La machine d’essai dispose d’environ **16 Go de RAM**. Le modèle téléchargé occupe
+environ **2,5 Go** ; prévoir aussi de la place pour Python et les dépendances.
+Les essais ont fonctionné sur CPU : un GPU n’est pas indispensable.
+
+### Windows — PowerShell
+
+Vérifier que `python --version` indique bien Python 3.14, puis exécuter :
 
 ```powershell
+python --version
 python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ollama pull qwen3:4b-instruct-2507-q4_K_M
 ollama list
-python main.py --input emails/ --output outputs/
-python -m pytest -q
-python evaluate.py --reference annotations.json --predictions outputs/resultats.json --output outputs/evaluation.json
 ```
 
-Si l'activation est interdite par PowerShell, utiliser directement
-`.venv\Scripts\python.exe` à la place de `python`. Sur Linux/macOS :
-`source .venv/bin/activate`. L'installation et l'exécution ont été vérifiées sur
-Windows ; les versions sont figées, sans prétendre avoir testé tous les OS.
-Le fichier `requirements.txt` fige aussi les dépendances transitives ; il ne
-constitue pas un verrou cryptographique des paquets.
+Ces commandes créent un environnement Python propre au projet, installent ses
+dépendances et téléchargent le modèle. **Il n’est pas nécessaire d’activer
+l’environnement** : les commandes utilisent directement son exécutable Python.
 
-Ollama doit fonctionner localement (`ollama serve` si le service n'est pas déjà
-lancé). Le téléchargement demande une connexion Internet ; l'inférence utilise
-`http://localhost:11434`. Aucun service cloud n'est utilisé par défaut.
+### Linux / macOS
+
+Avec Python 3.14 installé :
+
+```bash
+python3.14 -m venv .venv
+./.venv/bin/python -m pip install -r requirements.txt
+ollama pull qwen3:4b-instruct-2507-q4_K_M
+ollama list
+```
+
+Les essais du projet ont été réalisés sur Windows. Les commandes Linux/macOS
+sont fournies pour l’adaptation, sans validation de l’installation sur ces systèmes.
+
+## 2. Lancer l’application
+
+Ollama doit être en cours d’exécution. Si nécessaire, lancer cette commande dans
+un autre terminal et le laisser ouvert :
+
+```text
+ollama serve
+```
+
+Si Ollama est déjà lancé, cette étape est inutile.
+
+**Windows :**
 
 ```powershell
-python main.py --input emails/ --output outputs/ --model qwen3:4b-instruct-2507-q4_K_M --timeout 180 --host http://localhost:11434
+.\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-`--model` sélectionne un autre modèle déjà téléchargé. `--timeout` est le délai
-réseau par appel en secondes, pas une limite globale pour le lot.
+**Linux / macOS :**
 
-## Modèle et architecture
-
-Le candidat demandé est conservé : `qwen3:4b-instruct-2507-q4_K_M`, environ
-4 milliards de paramètres, poids quantifiés en `Q4_K_M`, environ 2,5 Go.
-La quantification réduit la mémoire des poids avec une possible perte de qualité.
-Ce format est compatible avec la machine relevée ; le chargement réel doit aussi
-tenir compte du contexte et des autres applications.
-Voir la [fiche officielle du modèle](https://ollama.com/library/qwen3:4b-instruct-2507-q4_K_M).
-
-Paramètres fixés dans `llm.py` : `temperature=0`, `seed=42`, `num_ctx=4096`,
-`num_predict=900`, `keep_alive="10m"`. Le contexte est la fenêtre de texte lue par
-le modèle ; `num_predict` borne la longueur de sa sortie. La température nulle
-réduit la variation ; elle ne garantit pas une reproduction bit à bit entre
-versions d'Ollama, matériel et modèles.
-
-Premier appel réel observé : **56,209 s**, chargement compris, pour une analyse
-synthétique valide. Ollama rapporte une exécution **100 % CPU**, sans VRAM allouée,
-et environ 3,2 Go de mémoire pour le modèle chargé. Le candidat est conservé ;
-aucun gain GPU n'est annoncé. Le digest exact, les durées et les détails sont dans
-`docs/diagnostic_modele.json` et `docs/verification.md`.
-
-```mermaid
-flowchart LR
-    A[emails/*.txt UTF-8] --> B[main : lecture stable]
-    B --> C[agent : traiter_email]
-    C --> D[Ollama : analyse JSON]
-    D --> E[Pydantic et règles Python]
-    E --> F{Réponse nécessaire ?}
-    F -->|oui| G[Ollama : choix du brouillon JSON]
-    F -->|non| H[Résultat sans brouillon]
-    G --> I[Pydantic : texte autorisé uniquement]
-    H --> J[resultats.json et reponses/]
-    I --> J
-    J --> K[evaluate et annotations séparées]
+```bash
+./.venv/bin/python -m streamlit run app.py
 ```
 
-Deux appels spécialisés au même modèle rendent l'analyse inspectable avant la
-rédaction. Le second reçoit l'email original, l'analyse après les règles Python
-et les formulations complètes proposées par `redaction.py`. Il en choisit une
-selon le thème, le ton et l'utilité d'une question complémentaire. Le schéma
-`BrouillonContraint` contient les textes autorisés dans une `enum` : aucun autre
-texte n'est accepté. Ce sont des formulations prudentes définies dans le code,
-à faire valider par Bochra, sans connaissance produit implicite.
-Spam et messages sans réponse utilisent un seul appel. Il n'y a ni outil autonome,
-ni recherche web, ni framework d'agents : l'orchestrateur est `traiter_email`.
+Ouvrir l’adresse affichée dans le terminal, normalement
+[http://127.0.0.1:8501](http://127.0.0.1:8501). `Ctrl+C` arrête l’application.
 
-Les schémas Pydantic génèrent le JSON Schema envoyé dans `format` et dans le
-prompt système. Pydantic valide ensuite le texte JSON reçu : catégories exactes,
-types stricts (la chaîne `"false"` n'est pas un booléen), champs requis, longueurs,
-absence de clés inconnues. Un JSON valide ne prouve pas la véracité du contenu.
-Un contrôle de ponctuation refuse aussi les résumés contenant plusieurs phrases ;
-ce contrôle simple peut prendre une abréviation pour une fin de phrase.
-Cette approche suit les [sorties structurées d'Ollama](https://docs.ollama.com/capabilities/structured-outputs)
-et les [modèles Pydantic](https://docs.pydantic.dev/latest/concepts/models/).
+Dans l’interface :
 
-## Données, règles et hypothèses
+1. Choisir **Fichiers locaux** et charger les fichiers `.txt`, par exemple ceux de `emails/`.
+2. Cliquer sur **Analyser les emails**.
+3. Sélectionner un email pour consulter son texte, son analyse et son brouillon.
+4. Relire, corriger et télécharger la réponse.
 
-Les 20 fichiers originaux et le PDF sont conservés. `docs/entrees_sha256.json`
-contient les empreintes des emails pour contrôler leur intégrité. Tous les emails
-sont des textes UTF-8, de 293 à 492 octets, avec `From`, `To`, `Date`, `Subject`,
-une ligne vide puis le corps. Le programme conserve l'ensemble du texte : aucun
-parseur MIME n'est nécessaire ici. UTF-8 avec BOM est aussi accepté ; aucun
-encodage de secours silencieux. Les exemples synthétiques vivent dans `tests/`.
+**Télécharger les corrections avant de quitter** : elles restent dans la session
+du navigateur et ne sont pas sauvegardées dans `outputs/`.
+La connexion Gmail n’est pas configurée ; utiliser les fichiers locaux.
 
-Le corpus contient 13 emails en français et 7 en anglais. Les pièces jointes ne
-sont que mentionnées. Il n'y a ni tarif, ni base produit, ni agenda, ni dossier
-client, ni procédure support, ni poste ouvert fourni au programme. Les dates
-relatives restent celles de l'email : on ne les recalcule pas au jour d'exécution.
+### Utiliser la ligne de commande
 
-Les règles sémantiques sont dans `prompts.py` :
+Pour traiter les 20 exemples et enregistrer les résultats dans `tmp/mon_test/` :
 
-| Décision | Règle retenue |
-|---|---|
-| Une catégorie principale | Problème bloquant/financier du client d'abord, sinon action principale. Démo avec prix : `demo`. Intégration commune/co-marketing : `partenariat`. |
-| Haute | Incident bloquant, litige financier, appel d'offres et demande de démo explicite, ce dernier choix étant une hypothèse commerciale. |
-| Moyenne | Autre demande actionnable, dont invitation à intervenir et changement d'adresse. |
-| Basse | Spam, newsletter, candidature, incident explicitement non urgent. |
-| Réponse | Demande actionnable ou accusé de réception d'une candidature. Aucune pour spam/newsletter/simple information. |
-| Langue bilingue | Langue de la demande principale ; à égalité, première demande actionnable. Les sorties linguistiques sont limitées à `fr` et `en`. |
-| Revue humaine | Incident bloquant, litige, appel d'offres ou ambiguïté réelle détectée par le modèle. |
+```powershell
+.\.venv\Scripts\python.exe main.py --input emails --output tmp/mon_test
+```
 
-La règle bilingue est une consigne au modèle, pas une garantie : l'essai réel
-`Bonjour / Hello` suivi d'une demande anglaise a été détecté à tort en français.
-Les 20 emails fournis sont unilingues. Ce défaut hors corpus reste une limite
-connue et exige une vérification de langue ; voir `docs/robustesse_reelle.json`.
+Sur Linux/macOS, remplacer `.\.venv\Scripts\python.exe` par `./.venv/bin/python`.
 
-Le PDF donne un exemple de démo en priorité haute sans définir une politique
-complète. Nous généralisons ce choix aux trois demandes de démo. La priorité basse
-du support explicitement non urgent (`email_06`) et des candidatures est une
-hypothèse à discuter avec l'équipe. L'invitation (`email_15`) et la newsletter
-(`email_20`) restent `autre`, conformément au PDF. Le phishing est `spam`.
+Le dossier de sortie contient :
 
-Dans Python, `appliquer_regles` garantit l'absence de réponse au spam. Il fusionne
-les signaux du modèle avec un filet lexical FR/EN (`detecter_signaux`) : un signal
-impose revue humaine et priorité haute, sauf priorité basse pour le spam. Ce filet
-évite une omission simple même si la catégorie est erronée ; il n'est pas un
-classifieur complet. Une citation ou une négation peut donner un faux positif.
-Des paraphrases peuvent être manquées. Tous les
-signaux sont conservés dans `cas_sensibles` pour expliquer le routage.
-La priorité proposée par le modèle est recalculée selon la politique : spam en
-basse ; signaux sensibles/démo en haute ; candidature, message sans réponse et
-support explicitement non urgent en basse ; moyenne sinon. Ce calcul est celui
-de l'application, pas une mesure de la priorité brute du modèle.
+| Fichier ou dossier | Contenu |
+| --- | --- |
+| `resultats.json` | Analyse de chaque email, brouillon éventuel et erreurs. |
+| `reponses/` | Brouillons dans des fichiers texte séparés. |
+| `execution.json` | Modèle, paramètres et mesures de l’exécution. |
+| `manifest.json` | Empreintes des brouillons, pour protéger les retouches lors d’une relance. |
 
-Les prompts isolent l'email dans un message utilisateur JSON et donnent les règles
-dans le message système. Une instruction contenue dans l'email est une donnée.
-Cela réduit l'injection de prompt sans prouver que le modèle lui résiste toujours.
-Le modèle ne dispose d'aucune capacité d'envoi, de navigation ou d'exécution.
+Pour utiliser ses propres emails, remplacer `emails` par le chemin de leur dossier.
+Mettre les chemins entre guillemets s’ils contiennent des espaces.
+Choisir un nouveau dossier de sortie si l’on veut conserver un essai précédent.
 
-Deux essais de rédaction libre, même avec des consignes renforcées, ont inventé
-des faits ou des décisions. La version livrée utilise donc un vocabulaire fermé
-de brouillons complets. Les placeholders, signatures et langues sont définis
-dans Python ; le modèle choisit le message mais n'ajoute aucun fait libre.
-Les essais rejetés sont archivés dans `docs/essai_initial/` et `docs/essai_cible/`.
-Ce compromis réduit la personnalisation : noms, montants et dates ne sont pas
-reproduits librement. Il donne une base prudente à compléter plutôt qu'une réponse
-produit prête à envoyer. L'utilité du second appel est limitée au choix de la
-formulation ; sans l'exigence de deux appels, une sélection par règles serait
-une alternative plus rapide à envisager.
+Pour ses propres fichiers, conserver les en-têtes `From:` et `Subject:` et une
+ligne vide avant le corps. Exemple de fichier `.txt` en UTF-8 :
 
-Les brouillons utilisent des champs `[À COMPLÉTER]` pour les informations absentes.
-Les affirmations d'un expéditeur doivent être présentées comme des éléments
-signalés, à vérifier : pas de reconnaissance de dette, de promesse d'avoir ou de
-remboursement. Ses disponibilités ne confirment pas celles de FAKTUS. Un cas
-sensible peut recevoir un accusé de réception prudent. La vérification factuelle,
-le ton et la pertinence nécessitent une relecture. Le schéma borne désormais le
-texte au catalogue, mais ne prouve pas que le modèle a choisi la bonne catégorie,
-la bonne langue d'analyse ou la variante la plus utile.
+```text
+From: Alex Martin <alex@example.com>
+Subject: Demande de démonstration
 
-## Sorties et erreurs
+Bonjour, je souhaite organiser une démonstration de votre solution.
+```
 
-`outputs/resultats.json` est une liste ordonnée par nom de fichier. Un succès
-contient `statut="succes"`, `fichier`, les huit champs d'analyse et `brouillon`
-(texte, ou `null`). `cas_sensibles` explique les motifs de revue. `reponse_necessaire`
-permet de vérifier la cohérence entre décision et fichier de réponse.
-Un brouillon est aussi écrit dans `outputs/reponses/email_XX_reponse.txt`.
+## 3. Hypothèses et règles retenues
 
-Une erreur technique a `statut="erreur"`, `fichier`, `type_erreur`, `message`,
-`analyse` (si le premier appel avait réussi). Elle n'a aucune catégorie de secours.
-Les codes incluent `email_vide`, `encodage`, `lecture`, `email_trop_long`,
-`connexion`, `modele_indisponible`, `timeout`, `ollama`, `sortie_invalide`.
-Le lot continue après une telle erreur. Le bilan affiche réussites et échecs.
-Une sortie JSON invalide entraîne un nouvel essai, puis une erreur au second
-échec. Les erreurs réseau ne sont pas répétées automatiquement.
+Ces choix définissent le périmètre du test ; ils ne sont pas des règles universelles
+de gestion des emails. Les huit catégories et la revue des cas sensibles viennent
+du sujet FAKTUS. Les règles précises de priorité, d’identité et de concision suivent
+les demandes de Bochra ; les choix d’implémentation sont expliqués dans la section 4.
 
-| Code de retour | Sens |
-|---|---|
-| 0 | Tous les emails ont été traités et enregistrés. |
-| 1 | Au moins un email en erreur ; résultats partiels enregistrés. |
-| 2 | Arguments, dossier absent/vide ou problème global de configuration/écriture. |
+| Hypothèse ou règle | Conséquence dans le projet |
+| --- | --- |
+| Les entrées sont des emails texte en UTF-8, en français ou en anglais. | Un fichier `.txt` par email ; les sous-dossiers et pièces jointes ne sont pas analysés. Un email de plus de 16 000 caractères est refusé. |
+| Une seule catégorie principale est attribuée. | Le modèle croise **l’objet et le corps** ; si les deux se contredisent, la demande explicite du corps est privilégiée. Une ambiguïté doit être signalée pour revue humaine. |
+| L’identité doit venir du message. | Le résumé et la justification commencent par le nom complet et l’entreprise lorsqu’ils sont fournis. Sinon, utiliser le nom ou le service connu, sans inventer. Le domaine de l’adresse ne suffit pas à déduire l’entreprise. |
+| L’analyse doit être facile à lire. | Résumé et justification : chacun **une phrase française, de 180 caractères maximum**. Le résumé décrit le besoin ; la justification explique la catégorie. |
+| La langue de réponse suit la demande principale. | Le brouillon est en français ou en anglais selon la langue détectée. La détection d’un message bilingue reste imparfaite. |
+| La priorité suit une règle explicite. | `spam` et `autre` : **basse** ; autres catégories : **haute** seulement avec « urgent » dans l’objet et un sujet précisé, **moyenne** sinon. |
+| Certains cas nécessitent une personne. | Incident bloquant, litige de facturation et appel d’offres imposent une revue humaine, indépendamment de la priorité. |
+| Aucune documentation produit approuvée n’est fournie. | Les brouillons utilisent des formulations préparées et des champs `[À COMPLÉTER]` pour les informations absentes. Une personne les vérifie avant utilisation. |
 
-Le programme lit les `.txt` directement dans le dossier, sans récursion. Un email
-de plus de 16 000 caractères est refusé sans troncature silencieuse. Ce seuil est
-une borne pratique pour ce petit corpus, pas un comptage exact des tokens ; un
-token est une unité de texte du modèle et n'est pas un nombre fixe de caractères.
+Le croisement de l’objet et du corps évite qu’un objet vague ou trompeur décide
+seul du classement. Si plusieurs demandes coexistent, le modèle privilégie un
+problème bloquant ou financier, puis l’action principale demandée. Une demande
+de démo avec une question de prix reste ainsi dans `demo`.
 
-`execution.json` conserve modèle demandé, paramètres, empreintes des prompts et
-du catalogue de rédaction, empreintes des entrées,
-durée du lot et durées/tokens des appels réussis. Un appel en erreur de transport
-n'y est pas chronométré ; son erreur reste dans le résultat du fichier.
+Le nom explicite et les phrases brèves facilitent la lecture par l’équipe ;
+la limite de 180 caractères est une convention du projet. La priorité est une
+règle métier vérifiable, tandis que la revue humaine répond au risque d’une
+réponse inappropriée : les deux décisions sont donc indépendantes.
 
-`manifest.json` enregistre les noms et empreintes des seuls brouillons créés.
-À la relance, un ancien brouillon devenu inutile (spam, erreur ou retrait du lot)
-est supprimé seulement s'il est dans ce manifeste et inchangé. Un fichier inconnu
-ou retouché à la main est préservé ; s'il entre en conflit, la commande renvoie 2.
-Déplacer la version humaine avant de relancer. Pas de nettoyage global du dossier.
-Les écritures sont atomiques par fichier, pas sur tout le lot : une interruption
-pendant l'enregistrement peut nécessiter de déplacer le dossier et de relancer
-vers un dossier neuf. Une entrée absente/vide ne modifie aucune sortie existante.
-Une exécution concurrente vers le même dossier n'est pas prise en charge.
+Exemples de priorité : **« URGENT — accès impossible »** peut donner une priorité
+haute pour du support ; **« Non urgent — demande de démo »** reste moyenne.
+« URGENT » seul ou une urgence mentionnée uniquement dans le corps ne suffit pas.
+Un spam reste en priorité basse, même si son objet contient « urgent ».
 
-## Évaluation et revue
+Les huit catégories possibles sont :
 
-`annotations.json` a été proposé par Codex après lecture des données, avant
-l'inférence. Son statut est **« à valider par Bochra »**. Les prédictions ne servent
-jamais de vérité de référence. Bochra doit vérifier les choix métier et changer
-ce statut explicitement une fois la référence relue.
+| Catégorie dans le JSON | Signification |
+| --- | --- |
+| `demo` | Demande de démonstration ou de rendez-vous produit. |
+| `question_commerciale` | Question avant achat : prix, intégrations, sécurité, appel d’offres. |
+| `support` | Aide à l’utilisation ou problème technique d’un client. |
+| `facturation` | Facture, paiement ou demande administrative de facturation. |
+| `partenariat` | Proposition de collaboration ou d’apport d’affaires. |
+| `candidature` | Candidature à un emploi ou à un stage. |
+| `spam` | Publicité non sollicitée ou message frauduleux. |
+| `autre` | Invitation, newsletter ou demande hors des catégories précédentes. |
 
-`evaluate.py` joint par nom, refuse les doublons et valide les lignes. Il signale
-références sans prédiction, prédictions sans référence et échecs techniques.
-La couverture est le nombre de succès appariés divisé par le nombre d'annotations.
-Les scores conditionnels portent uniquement sur ces succès. Le rapport indique
-aussi les bonnes catégories sur **toute** la référence afin de rendre les échecs
-visibles. Une couverture nulle produit des scores `null` et une matrice de zéros.
+Un spam ne reçoit pas de brouillon. Une newsletter sans demande de réponse non plus.
+Une invitation demandant une confirmation peut recevoir un brouillon tout en
+restant dans `autre`, avec une priorité basse.
 
-L'exactitude est la proportion de bonnes catégories. La matrice de confusion a
-huit lignes (référence) et huit colonnes (prédiction), dans l'ordre documenté dans
-le rapport. Pour chaque catégorie : précision (fiabilité des prédictions de cette
-catégorie), rappel (part des exemples retrouvés), F1 (équilibre des deux) et support
-(nombre d'exemples). La macro F1 est la moyenne des huit F1, y compris une classe
-sans exemple, dont le score vaut alors zéro. Les [métriques scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html)
-sont utilisées avec `zero_division=0`.
+## 4. Comment fonctionne le traitement ?
 
-Le rapport liste les erreurs de langue, priorité, réponse et revue humaine, puis
-les faux négatifs sensibles (revue oubliée), faux positifs (revue excessive) et
-cas sensibles non évalués. L'évaluation renvoie 1 pour une couverture incomplète,
-des prédictions sans référence ou des erreurs techniques ; 2 pour données
-invalides. Un mauvais score seul n'entraîne pas d'erreur de commande.
+1. **Lire l’email.** Python extrait l’objet, le corps et le nom affiché de l’expéditeur.
+2. **Analyser avec le modèle.** Les consignes de `prompts.py` lui demandent une
+   réponse JSON : catégorie, langue, résumé, justification et besoin de réponse.
+3. **Contrôler le résultat.** Pydantic, la bibliothèque de validation, vérifie les
+   champs attendus, leurs types et les contraintes de texte. Python vérifie et
+   met en forme l’identité fournie. Avec un nom affiché connu, il formule la
+   justification à partir du motif de la catégorie.
+4. **Appliquer les règles.** Python recalcule la priorité et ajoute les alertes
+   sensibles détectées par mots-clés, en complément de l’analyse du modèle.
+5. **Préparer un brouillon si nécessaire.** Un deuxième appel au même modèle choisit
+   une réponse complète parmi les formulations autorisées dans `redaction.py`.
+   Tout texte extérieur à cette liste est refusé.
+6. **Présenter ou enregistrer le résultat.** L’interface permet la consultation et
+   la correction ; la commande écrit les fichiers de sortie.
 
-Une référence proposée par l'assistant et 20 emails de développement ne mesurent
-pas la généralisation. La qualité des brouillons est évaluée séparément avec
-`docs/grille_revue.md`. Le statut des vérifications réelles et l'historique des
-prompts sont consignés dans `docs/verification.md`.
+La classification utilise donc un modèle déjà entraîné, guidé par des consignes :
+**aucun entraînement sur les 20 emails n’est réalisé**.
+Les règles Python rendent certaines décisions, notamment la priorité, déterministes.
 
-## Lecture du code et suite
+### Pourquoi ce modèle ?
 
-Résultats réellement obtenus avec la version livrée : **20 succès / 0 échec,
-17 brouillons, 39 appels, 1 007,722 s sur CPU**. Exactitude de classification,
-macro F1 et couverture : **1,00** sur la référence proposée. Aucun écart sur les
-décisions annotées, aucun faux négatif/positif de revue sensible. Les deux reprises
-de validation (`06`, `16`) ont réussi au second essai. Tests finaux : **32 réussis**.
-Ce sont des résultats de développement **à valider par Bochra**, pas une mesure
-de généralisation ni une note de qualité des résumés. Des imprécisions narratives
-subsistent ; voir `docs/revue_assistant.md`. La grille humaine reste à remplir.
+**`qwen3:4b-instruct-2507-q4_K_M`** était le candidat de départ demandé pour ce
+projet. Nous l’avons conservé après vérification de son exécution sur la machine
+disponible et essais réels sur les emails français et anglais :
 
-Le guide détaillé, le parcours d'un email et les questions de débrief sont dans
-[GUIDE_REVISION.md](GUIDE_REVISION.md). Les tests sont simulés et n'exigent pas
-Ollama : `python -m pytest -q`. Ils ne prouvent pas la qualité linguistique du
-modèle ; celle-ci dépend des sorties réelles et de leur revue.
+- il s’exécute localement avec Ollama, sans clé d’API cloud ;
+- sa taille d’environ 4 milliards de paramètres permet de viser la machine disponible ;
+- ses poids compressés au format `Q4_K_M` réduisent la mémoire nécessaire ;
+- il a été utilisé pour les emails français et anglais du corpus.
 
-Améliorations après ce périmètre : référence validée et jeu tenu à l'écart,
-documentation produit approuvée pour étayer les réponses, meilleure détection
-sémantique des cas sensibles, tests adversariaux du modèle réel, suivi des
-versions/digests à chaque exécution, écriture transactionnelle du lot. Une
-connexion mail et une interface ne font pas partie de cette version.
+C’est un compromis pratique pour ce test. Aucun comparatif complet avec d’autres
+modèles n’a été réalisé, et l’effet de la compression sur la qualité n’a pas été
+isolé. Les essais sur CPU montrent que ce choix reste lent ; sa présence en local
+ne suffit pas à garantir une bonne qualité ni une réponse rapide. Les relevés
+sont dans [le diagnostic du modèle](docs/diagnostic_modele.json).
+
+### Pourquoi ces outils et cette organisation ?
+
+| Choix | Pourquoi ce choix et quel compromis ? |
+| --- | --- |
+| **Python et bibliothèque standard** | Python suit le périmètre demandé. Ses outils intégrés suffisent pour lire les fichiers, interpréter les en-têtes, manipuler le JSON et créer la commande de lancement. |
+| **Client Python officiel d’Ollama** | Il fournit les appels au modèle et la gestion du transport ; cela évite de réécrire un client HTTP. Le serveur Ollama doit être installé et lancé séparément. |
+| **Fonctions explicites dans quelques modules** | Le parcours comporte des étapes connues. Des fonctions séparant traitement, appels au modèle et interface suffisent pour le suivre et le tester, sans ajouter de framework d’orchestration. |
+| **Un LLM pour le sens, des règles Python pour les obligations** | Le modèle interprète les formulations variées. Python impose la priorité et l’absence de réponse au spam. Les alertes par mots-clés complètent le modèle, mais peuvent signaler trop de cas sensibles. |
+| **Deux appels spécialisés au même modèle** | Ce découpage suit le périmètre demandé : analyser, valider, puis préparer la réponse. Il permet de sauter la rédaction si elle est inutile et d’identifier l’étape en erreur. Il augmente toutefois la latence. |
+| **JSON contraint et validation Pydantic** | Une structure commune facilite l’affichage et l’enregistrement. Le schéma guide le modèle ; Pydantic refuse les champs, types ou textes non conformes. Une structure valide ne prouve pas que le contenu est vrai. |
+| **Catalogue de brouillons et champs à compléter** | Les essais de rédaction libre ont inventé des affirmations produit. Le modèle choisit donc un texte autorisé, sans ajouter de faits ; les informations manquantes restent à compléter. Les réponses sont moins personnalisées. |
+| **Streamlit et état de session** | L’interface Python réutilise le traitement de la commande et permet de corriger les brouillons. La mémoire de session convient à cette démonstration ; les corrections doivent être téléchargées avant de quitter. |
+| **Fichiers locaux, empreintes et écritures protégées** | Ils rendent les résultats faciles à inspecter pour ce petit lot. Les empreintes repèrent les brouillons retouchés et les anciennes analyses. Le remplacement atomique protège chaque fichier pendant l’écriture, sans garantir une transaction sur tout le lot. |
+| **Traitement séquentiel et reprises limitées** | Un email à la fois garde le suivi simple et limite les appels simultanés sur la machine CPU. Deux tentatives au maximum corrigent un JSON invalide sans boucle infinie. Une erreur réseau est signalée pour permettre une relance explicite. |
+| **pytest et scikit-learn** | pytest vérifie les règles et les erreurs avec un transport simulé ; scikit-learn calcule les métriques usuelles. Les essais réels complètent ces tests : une simulation ne mesure pas la qualité du modèle. |
+| **Environnement virtuel et versions figées** | Ils isolent les dépendances et facilitent la reproduction de l’environnement vérifié. Python 3.14 correspond à cet environnement, sans être une nécessité propre au classement des emails ; la compatibilité sur tous les systèmes n’est pas garantie. |
+
+Les consignes demandent aussi de traiter le contenu d’un email comme une donnée,
+même s’il contient une demande de changer les règles. Cette séparation réduit
+le risque de détourner le traitement ; elle ne garantit pas l’immunité du modèle.
+
+Avec le catalogue actuel, le deuxième appel apporte surtout un choix de thème et
+de formulation. Une sélection par règles serait une piste pour réduire la latence
+si l’exigence des deux appels était levée. Aucune recherche documentaire n’est
+ajoutée en l’absence d’une documentation produit approuvée.
+
+### Pourquoi ces réglages ?
+
+Ils sont définis dans `llm.py`. Un **token** est une unité de texte traitée par
+le modèle. Ces valeurs sont des réglages pratiques pour ce test, pas le résultat
+d’une recherche de paramètres optimaux.
+
+| Réglage | Justification et limite |
+| --- | --- |
+| `temperature=0` | Réduire la variation pour une tâche de classement. Cela ne garantit ni l’exactitude ni des résultats toujours identiques. |
+| `seed=42` | Fixer une graine pour faciliter les comparaisons. Le nombre 42 n’a pas de propriété particulière ; matériel et versions peuvent encore modifier le résultat. |
+| `num_ctx=4096` | Borner la fenêtre de texte et la mémoire utilisée. Les consignes, le schéma, l’email et la réponse doivent se partager cette fenêtre. |
+| `num_predict=900` | Laisser de la place au JSON attendu tout en bornant la longueur générée. Une sortie trop longue peut atteindre cette limite et devenir invalide. |
+| `keep_alive="10m"` | Garder le modèle chargé entre les emails pour limiter les rechargements, au prix de mémoire occupée pendant cette durée. |
+| Délai réseau de `180` secondes | Laisser du temps au traitement local sur CPU tout en bornant l’attente réseau. Ce délai s’applique par appel et se règle avec `--timeout` dans la commande. |
+| Deux tentatives de validation | Permettre une correction après un premier JSON refusé, avec un coût et une attente bornés. Une erreur persistante reste visible. |
+
+La limite d’entrée de **16 000 caractères**, dans `agent.py`, écarte les fichiers
+anormalement longs pour ce corpus. C’est un garde-fou simple, pas un comptage de
+tokens : elle ne garantit pas à elle seule que toute la requête tient dans le contexte.
+
+Les détails des essais ayant motivé ces compromis sont dans
+[le bilan de vérification](docs/verification.md).
+
+## 5. Tester et vérifier les résultats
+
+**Tests du code, sans lancer Ollama :**
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+**Comparer un essai réel aux annotations proposées :**
+
+```powershell
+.\.venv\Scripts\python.exe evaluate.py --reference annotations.json --predictions tmp/mon_test/resultats.json --output tmp/mon_test/evaluation.json
+```
+
+Cette deuxième commande s’utilise après le traitement en ligne de commande.
+Elle mesure notamment les catégories correctes, les erreurs techniques et les
+écarts de priorité, de langue et de besoin de réponse. Elle ne relance pas le modèle.
+
+Dernière vérification réelle, le **20 novembre 2026** :
+**20 emails traités, 0 erreur technique, 17 brouillons**, en environ **14 min 41 s
+sur CPU**. La suite de tests du code compte **149 tests réussis**.
+Les résultats livrés sont dans [outputs/](outputs/). Le
+[bilan de vérification](docs/verification.md) décrit les essais et leurs limites.
+
+Les catégories et décisions évaluées correspondent toutes à la référence proposée.
+Cette référence reste **à valider par Bochra**, et les 20 emails constituent un
+petit corpus de développement. Ce résultat ne garantit ni les performances sur
+de nouveaux emails, ni la fidélité de chaque résumé : des formulations imprécises
+restent à relire.
+Le nom et l’entreprise déclarés dans un email ne sont pas authentifiés par l’application.
+
+## 6. En cas de problème
+
+| Problème | Action |
+| --- | --- |
+| Ollama inaccessible | Vérifier qu’Ollama est lancé ; utiliser `ollama serve` si nécessaire. L’adresse par défaut est `http://localhost:11434`. |
+| Modèle introuvable | Relancer `ollama pull qwen3:4b-instruct-2507-q4_K_M`, puis vérifier avec `ollama list`. |
+| Traitement lent | Sur CPU, un email peut prendre plusieurs dizaines de secondes, davantage avec une reprise. Le traitement est séquentiel. |
+| Délai dépassé en ligne de commande | Ajouter `--timeout 300` si la machine a besoin de plus de temps. Le délai par défaut est de 180 secondes **par appel**, pas pour tout le lot. |
+| Email marqué « Erreur » | Ouvrir **Détail des erreurs**, puis **Réessayer les erreurs** pour un échec récupérable. Corriger et recharger un fichier vide, trop long ou mal encodé. |
+| Résultat marqué « À actualiser » | Les règles ont changé depuis son analyse ; cliquer sur **Analyser les emails** ou **Réanalyser cet email**. |
+| Brouillon modifié qui bloque une relance CLI | Conserver sa version corrigée ailleurs ou choisir un nouveau dossier de sortie. La commande protège les retouches manuelles. |
+
+En cas de réponse JSON invalide, le programme demande une correction au modèle,
+avec **deux tentatives maximum**. Une erreur est signalée si les deux échouent.
+Les erreurs réseau ne sont pas réessayées automatiquement.
+Les diagnostics de l’interface sont enregistrés dans `tmp/diagnostics_interface/`.
+
+## 7. Repères dans le projet
+
+Le traitement reste une suite de fonctions Python : lire, analyser, appliquer
+les règles, puis préparer la réponse. Les fonctions de validation et d’interface
+sont séparées pour pouvoir suivre chaque étape et la tester. Le modèle, ses
+consignes et les brouillons autorisés conservent le comportement vérifié.
+
+| Fichier | Rôle |
+| --- | --- |
+| [app.py](app.py) | Interface Streamlit. |
+| [main.py](main.py) | Traitement d’un dossier et enregistrement des sorties. |
+| [agent.py](agent.py) | Enchaînement analyse, règles métier et brouillon. |
+| [llm.py](llm.py) | Appels à Ollama, paramètres et gestion des erreurs. |
+| [prompts.py](prompts.py) | Consignes données au modèle. |
+| [schemas.py](schemas.py) | Structure et validation des réponses. |
+| [redaction.py](redaction.py) | Catalogue des brouillons autorisés. |
+| [evaluate.py](evaluate.py) | Comparaison aux annotations de référence. |
+| [diagnostics.py](diagnostics.py) | Enregistrement local des erreurs de l’interface. |
+
+Les dossiers du rendu sont `emails/` pour les entrées, `outputs/` pour les
+résultats, `tests/` pour les tests et `docs/` pour le bilan et ses preuves.
+`.streamlit/` contient la configuration de l’interface.
+
+Pour approfondir : [vérifications, limites et améliorations envisagées](docs/verification.md).

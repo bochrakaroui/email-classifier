@@ -27,15 +27,15 @@ class OllamaLLM:
         self.client = client if client is not None else Client(host=host, timeout=timeout)
         self.appels: list[dict] = []
 
-    def generer(self, messages: list[dict], schema: type[T]) -> T:
+    def generer(self, messages: list[dict], schema: type[T], *, contexte: dict | None = None) -> T:
         """Deux essais maximum, uniquement si le contenu JSON est invalide."""
         schema_json = schema.model_json_schema()
         conversation = [dict(m) for m in messages]
         conversation[0]["content"] += "\nSchéma JSON : " + json.dumps(schema_json, ensure_ascii=False)
-        for tentative in range(2):
+        for tentative in (1, 2):
             debut = time.perf_counter()
             try:
-                response = self.client.chat(
+                reponse = self.client.chat(
                     model=self.model, messages=conversation, format=schema_json,
                     options=OPTIONS, stream=False, keep_alive="10m",
                 )
@@ -47,22 +47,22 @@ class OllamaLLM:
                 code = "modele_indisponible" if exc.status_code == 404 else "ollama"
                 raise ErreurTraitement(code, f"Ollama HTTP {exc.status_code} : {exc.error}") from exc
             self.appels.append({
-                "schema": schema.__name__, "tentative": tentative + 1,
+                "schema": schema.__name__, "tentative": tentative,
                 "secondes": round(time.perf_counter() - debut, 3),
-                "eval_count": response.eval_count,
-                "eval_duration_ns": response.eval_duration,
-                "load_duration_ns": response.load_duration,
+                "eval_count": reponse.eval_count,
+                "eval_duration_ns": reponse.eval_duration,
+                "load_duration_ns": reponse.load_duration,
             })
+            contenu = reponse.message.content or ""
             try:
-                return schema.model_validate_json(response.message.content or "")
+                return schema.model_validate_json(contenu, context=contexte)
             except ValidationError as exc:
-                if tentative == 1:
-                    raise ErreurTraitement(
-                        "sortie_invalide", f"{schema.__name__} invalide après 2 essais : "
-                        + "; ".join(e["msg"] for e in exc.errors(include_input=False))[:500],
-                    ) from exc
-                conversation.append({"role": "assistant", "content": response.message.content or ""})
                 raisons = "; ".join(e["msg"] for e in exc.errors(include_input=False))[:500]
+                if tentative == 2:
+                    raise ErreurTraitement(
+                        "sortie_invalide", f"{schema.__name__} invalide après 2 essais : {raisons}",
+                    ) from exc
+                conversation.append({"role": "assistant", "content": contenu})
                 conversation.append({"role": "user", "content":
                     "La sortie ne respecte pas le schéma. Corrige uniquement le JSON selon le schéma système. " + raisons})
         raise AssertionError("Boucle de reprise terminée sans résultat")

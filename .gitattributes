@@ -1,6 +1,5 @@
 emails/*.txt -text
 outputs/reponses/*.txt -text
-docs/essai_initial/prompts.py.txt -text
 *.py text eol=lf
 *.md text eol=lf
 *.json text eol=lf

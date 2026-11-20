@@ -1,4 +1,4 @@
-"""Formulations approuvées : aucune connaissance produit ou décision inventée.
+"""Formulations prédéfinies : aucune connaissance produit ou décision inventée.
 
 Le deuxième appel choisit un texte complet de cette liste par un schéma à enum.
 La variété concerne le ton, le thème et les questions, jamais des faits FAKTUS.
@@ -8,7 +8,7 @@ from schemas import Analyse
 
 
 def propositions_brouillons(analyse: Analyse) -> list[str]:
-    en = analyse.langue == "en"
+    anglais = analyse.langue == "en"
     categorie = analyse.categorie
     if "appel_offres" in analyse.cas_sensibles:
         textes = [
@@ -56,24 +56,24 @@ def propositions_brouillons(analyse: Analyse) -> list[str]:
                 "Thank you for your invitation and your interest in our team.\n\n[INTEREST AND AVAILABILITY TO CONFIRM]",
             ],
         }[categorie]
-    corps = textes[int(en)]
+    corps = textes[1] if anglais else textes[0]
     # Variantes spécifiques utiles ; le modèle choisit selon la demande originale.
     variantes = [corps]
     if categorie == "question_commerciale" and not analyse.cas_sensibles:
         variantes.append(
-            "Thank you for your questions about data hosting, GDPR compliance and security documentation.\n\n[VERIFIED HOSTING, GDPR AND DOCUMENTATION INFORMATION TO ADD]" if en else
+            "Thank you for your questions about data hosting, GDPR compliance and security documentation.\n\n[VERIFIED HOSTING, GDPR AND DOCUMENTATION INFORMATION TO ADD]" if anglais else
             "Merci pour vos questions sur l'hébergement, la conformité RGPD et la documentation de sécurité.\n\n[INFORMATIONS VALIDÉES SUR HÉBERGEMENT, RGPD ET DOCUMENTATION À COMPLÉTER]"
         )
         variantes.append(
-            "Thank you for your questions about pricing and integrations.\n\n[VERIFIED PRICING AND INTEGRATION INFORMATION TO ADD]" if en else
+            "Thank you for your questions about pricing and integrations.\n\n[VERIFIED PRICING AND INTEGRATION INFORMATION TO ADD]" if anglais else
             "Merci pour vos questions sur les tarifs et les intégrations.\n\n[TARIFS ET INTÉGRATIONS VALIDÉS À COMPLÉTER]"
         )
     if categorie == "support" and not analyse.cas_sensibles:
-        variantes.append(corps + ("\n\nCould you share a screenshot of the issue with sensitive information removed?" if en else
+        variantes.append(corps + ("\n\nCould you share a screenshot of the issue with sensitive information removed?" if anglais else
                                   "\n\nPourriez-vous joindre une capture du problème, sans données sensibles ?"))
-    debut = "Hello,\n\n" if en else "Bonjour,\n\n"
-    fin = "\n\nBest regards,\nThe FAKTUS team" if en else "\n\nCordialement,\nL'équipe FAKTUS"
+    debut = "Hello,\n\n" if anglais else "Bonjour,\n\n"
+    fin = "\n\nBest regards,\nThe FAKTUS team" if anglais else "\n\nCordialement,\nL'équipe FAKTUS"
     # Deux tons possibles sans changement de faits ni de décision.
     return [debut + t + fin for t in variantes] + [
-        ("Dear Sir or Madam,\n\n" if en else "Madame, Monsieur,\n\n") + corps + fin
+        ("Dear Sir or Madam,\n\n" if anglais else "Madame, Monsieur,\n\n") + corps + fin
     ]

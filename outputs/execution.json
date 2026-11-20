@@ -1,342 +1,452 @@
 {
-  "date_utc": "2026-11-19T00:55:30.839186+00:00",
+  "date_export_utc": "2026-11-20T12:17:30.740983+00:00",
+  "source_rapport": "tmp/diagnostic_erreurs_apres/rapport.json",
   "modele": "qwen3:4b-instruct-2507-q4_K_M",
-  "host": "http://localhost:11434",
   "options": {
     "temperature": 0,
     "seed": 42,
     "num_ctx": 4096,
     "num_predict": 900
   },
-  "timeout_secondes": 180,
-  "secondes": 1007.722,
+  "secondes": 881.273,
   "reussites": 20,
   "echecs": 0,
   "appels": [
     {
-      "schema": "Analyse",
+      "schema": "AnalyseModele",
       "tentative": 1,
-      "secondes": 26.256,
-      "eval_count": 131,
-      "eval_duration_ns": 18315981000,
-      "load_duration_ns": 12441100
+      "secondes": 85.605,
+      "eval_count": 143,
+      "eval_duration_ns": 29714732000,
+      "load_duration_ns": 5097600
     },
     {
       "schema": "BrouillonContraint",
       "tentative": 1,
-      "secondes": 34.573,
-      "eval_count": 79,
-      "eval_duration_ns": 12695852000,
-      "load_duration_ns": 22100900
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 25.853,
-      "eval_count": 150,
-      "eval_duration_ns": 20642230000,
-      "load_duration_ns": 23146900
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 28.54,
-      "eval_count": 63,
-      "eval_duration_ns": 8403233000,
-      "load_duration_ns": 13993300
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 25.917,
-      "eval_count": 142,
-      "eval_duration_ns": 20947822000,
-      "load_duration_ns": 14156900
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 34.529,
-      "eval_count": 60,
-      "eval_duration_ns": 8410594999,
-      "load_duration_ns": 13177000
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 20.189,
-      "eval_count": 118,
-      "eval_duration_ns": 16131362000,
-      "load_duration_ns": 13996000
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 22.641,
-      "eval_count": 53,
-      "eval_duration_ns": 7340981000,
-      "load_duration_ns": 19254300
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 29.916,
-      "eval_count": 173,
-      "eval_duration_ns": 24811291000,
-      "load_duration_ns": 13287900
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 39.406,
-      "eval_count": 100,
-      "eval_duration_ns": 14883038000,
-      "load_duration_ns": 14985800
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 32.321,
-      "eval_count": 187,
-      "eval_duration_ns": 27455260000,
-      "load_duration_ns": 23312700
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 2,
-      "secondes": 31.094,
-      "eval_count": 164,
-      "eval_duration_ns": 25859085000,
-      "load_duration_ns": 13140000
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 28.714,
-      "eval_count": 51,
-      "eval_duration_ns": 6347311000,
-      "load_duration_ns": 20045000
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 36.263,
-      "eval_count": 212,
-      "eval_duration_ns": 30720895000,
-      "load_duration_ns": 10301300
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 35.242,
+      "secondes": 22.05,
       "eval_count": 85,
-      "eval_duration_ns": 10636827000,
-      "load_duration_ns": 18499800
+      "eval_duration_ns": 10649770000,
+      "load_duration_ns": 44286600
     },
     {
-      "schema": "Analyse",
+      "schema": "AnalyseModele",
       "tentative": 1,
-      "secondes": 20.083,
-      "eval_count": 115,
-      "eval_duration_ns": 15773537000,
-      "load_duration_ns": 16180300
+      "secondes": 24.021,
+      "eval_count": 134,
+      "eval_duration_ns": 20527190000,
+      "load_duration_ns": 46992600
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 2,
+      "secondes": 23.259,
+      "eval_count": 121,
+      "eval_duration_ns": 19081499000,
+      "load_duration_ns": 5490100
     },
     {
       "schema": "BrouillonContraint",
       "tentative": 1,
-      "secondes": 22.73,
+      "secondes": 17.29,
       "eval_count": 46,
-      "eval_duration_ns": 5760271000,
-      "load_duration_ns": 14524500
+      "eval_duration_ns": 4247979999,
+      "load_duration_ns": 37978300
     },
     {
-      "schema": "Analyse",
+      "schema": "AnalyseModele",
       "tentative": 1,
-      "secondes": 23.982,
-      "eval_count": 138,
-      "eval_duration_ns": 18709844000,
-      "load_duration_ns": 12567500
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 29.505,
-      "eval_count": 65,
-      "eval_duration_ns": 8576324000,
-      "load_duration_ns": 17195600
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 22.305,
-      "eval_count": 127,
-      "eval_duration_ns": 17213420000,
-      "load_duration_ns": 17412600
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 24.049,
-      "eval_count": 49,
-      "eval_duration_ns": 6296174000,
-      "load_duration_ns": 9023600
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 23.027,
-      "eval_count": 128,
-      "eval_duration_ns": 18545200000,
-      "load_duration_ns": 12140100
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 25.952,
-      "eval_count": 58,
-      "eval_duration_ns": 7244456000,
-      "load_duration_ns": 13197700
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 26.42,
-      "eval_count": 154,
-      "eval_duration_ns": 22110217000,
-      "load_duration_ns": 10429100
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 23.959,
-      "eval_count": 49,
-      "eval_duration_ns": 6088326000,
-      "load_duration_ns": 15583600
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 26.889,
+      "secondes": 23.546,
       "eval_count": 142,
-      "eval_duration_ns": 21355840000,
-      "load_duration_ns": 17284100
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 24.402,
-      "eval_count": 149,
-      "eval_duration_ns": 20407085000,
-      "load_duration_ns": 11972900
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 22.263,
-      "eval_count": 115,
-      "eval_duration_ns": 17281441000,
-      "load_duration_ns": 10616300
+      "eval_duration_ns": 18377629000,
+      "load_duration_ns": 5542900
     },
     {
       "schema": "BrouillonContraint",
       "tentative": 1,
-      "secondes": 9.169,
-      "eval_count": 64,
-      "eval_duration_ns": 8062456000,
-      "load_duration_ns": 18525400
+      "secondes": 9.073,
+      "eval_count": 49,
+      "eval_duration_ns": 4417044000,
+      "load_duration_ns": 7497400
     },
     {
-      "schema": "Analyse",
+      "schema": "AnalyseModele",
       "tentative": 1,
-      "secondes": 25.486,
-      "eval_count": 152,
-      "eval_duration_ns": 20622714000,
-      "load_duration_ns": 16206100
+      "secondes": 19.459,
+      "eval_count": 114,
+      "eval_duration_ns": 16092144000,
+      "load_duration_ns": 50707200
     },
     {
-      "schema": "Analyse",
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 12.433,
+      "eval_count": 51,
+      "eval_duration_ns": 4523727000,
+      "load_duration_ns": 13173300
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 22.97,
+      "eval_count": 129,
+      "eval_duration_ns": 19345565000,
+      "load_duration_ns": 21629900
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 12.113,
+      "eval_count": 63,
+      "eval_duration_ns": 5603171000,
+      "load_duration_ns": 10123100
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 25.396,
+      "eval_count": 128,
+      "eval_duration_ns": 20213086000,
+      "load_duration_ns": 6306400
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 7.18,
+      "eval_count": 60,
+      "eval_duration_ns": 5856195000,
+      "load_duration_ns": 6541600
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 22.449,
+      "eval_count": 127,
+      "eval_duration_ns": 19308522000,
+      "load_duration_ns": 19876700
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 12.213,
+      "eval_count": 53,
+      "eval_duration_ns": 5230019000,
+      "load_duration_ns": 9175300
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 28.496,
+      "eval_count": 155,
+      "eval_duration_ns": 24265418000,
+      "load_duration_ns": 10960800
+    },
+    {
+      "schema": "AnalyseModele",
       "tentative": 2,
-      "secondes": 25.825,
-      "eval_count": 141,
-      "eval_duration_ns": 20700550000,
-      "load_duration_ns": 13633300
+      "secondes": 27.085,
+      "eval_count": 143,
+      "eval_duration_ns": 24297150000,
+      "load_duration_ns": 9076200
     },
     {
       "schema": "BrouillonContraint",
       "tentative": 1,
-      "secondes": 23.779,
-      "eval_count": 79,
-      "eval_duration_ns": 10526443000,
-      "load_duration_ns": 13275600
+      "secondes": 18.005,
+      "eval_count": 100,
+      "eval_duration_ns": 9773962000,
+      "load_duration_ns": 8779800
     },
     {
-      "schema": "Analyse",
+      "schema": "AnalyseModele",
       "tentative": 1,
-      "secondes": 21.626,
-      "eval_count": 131,
-      "eval_duration_ns": 17763844000,
-      "load_duration_ns": 14524600
-    },
-    {
-      "schema": "BrouillonContraint",
-      "tentative": 1,
-      "secondes": 19.683,
-      "eval_count": 41,
-      "eval_duration_ns": 5360977000,
-      "load_duration_ns": 13463100
-    },
-    {
-      "schema": "Analyse",
-      "tentative": 1,
-      "secondes": 29.72,
-      "eval_count": 167,
-      "eval_duration_ns": 23935839000,
-      "load_duration_ns": 11649100
+      "secondes": 23.886,
+      "eval_count": 110,
+      "eval_duration_ns": 18570749000,
+      "load_duration_ns": 13659100
     },
     {
       "schema": "BrouillonContraint",
       "tentative": 1,
-      "secondes": 8.984,
-      "eval_count": 67,
-      "eval_duration_ns": 8291317999,
-      "load_duration_ns": 15082400
+      "secondes": 21.121,
+      "eval_count": 65,
+      "eval_duration_ns": 6452779000,
+      "load_duration_ns": 9095200
     },
     {
-      "schema": "Analyse",
+      "schema": "AnalyseModele",
       "tentative": 1,
-      "secondes": 27.25,
-      "eval_count": 158,
-      "eval_duration_ns": 22918991000,
-      "load_duration_ns": 12787300
+      "secondes": 20.304,
+      "eval_count": 121,
+      "eval_duration_ns": 16909917000,
+      "load_duration_ns": 7545500
     },
     {
       "schema": "BrouillonContraint",
       "tentative": 1,
-      "secondes": 24.774,
-      "eval_count": 85,
-      "eval_duration_ns": 11601509000,
-      "load_duration_ns": 19450600
+      "secondes": 10.666,
+      "eval_count": 58,
+      "eval_duration_ns": 5282613000,
+      "load_duration_ns": 6210700
     },
     {
-      "schema": "Analyse",
+      "schema": "AnalyseModele",
       "tentative": 1,
-      "secondes": 24.309,
+      "secondes": 19.607,
+      "eval_count": 107,
+      "eval_duration_ns": 16170938000,
+      "load_duration_ns": 8206700
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 9.698,
+      "eval_count": 49,
+      "eval_duration_ns": 4751077000,
+      "load_duration_ns": 4806300
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 30.925,
+      "eval_count": 154,
+      "eval_duration_ns": 26128680000,
+      "load_duration_ns": 11429300
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 23.301,
+      "eval_count": 124,
+      "eval_duration_ns": 20358961000,
+      "load_duration_ns": 5876000
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 2,
+      "secondes": 25.511,
       "eval_count": 119,
-      "eval_duration_ns": 19407761000,
-      "load_duration_ns": 20657400
+      "eval_duration_ns": 19142996000,
+      "load_duration_ns": 10456100
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 21.704,
+      "eval_count": 131,
+      "eval_duration_ns": 17911216000,
+      "load_duration_ns": 118451600
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 12.91,
+      "eval_count": 64,
+      "eval_duration_ns": 5942520000,
+      "load_duration_ns": 7889000
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 20.556,
+      "eval_count": 119,
+      "eval_duration_ns": 16847542000,
+      "load_duration_ns": 6579200
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 17.05,
+      "eval_count": 79,
+      "eval_duration_ns": 7417645000,
+      "load_duration_ns": 7138800
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 19.889,
+      "eval_count": 115,
+      "eval_duration_ns": 17004188999,
+      "load_duration_ns": 8131700
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 5.212,
+      "eval_count": 41,
+      "eval_duration_ns": 4596383000,
+      "load_duration_ns": 5400700
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 29.723,
+      "eval_count": 151,
+      "eval_duration_ns": 24290087000,
+      "load_duration_ns": 8451700
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 2,
+      "secondes": 25.012,
+      "eval_count": 139,
+      "eval_duration_ns": 22094983000,
+      "load_duration_ns": 7188000
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 13.224,
+      "eval_count": 67,
+      "eval_duration_ns": 7597537000,
+      "load_duration_ns": 5954400
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 28.306,
+      "eval_count": 131,
+      "eval_duration_ns": 24245777000,
+      "load_duration_ns": 9579700
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 21.621,
+      "eval_count": 85,
+      "eval_duration_ns": 9786734000,
+      "load_duration_ns": 9297300
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 22.663,
+      "eval_count": 122,
+      "eval_duration_ns": 18595778000,
+      "load_duration_ns": 12398300
+    },
+    {
+      "schema": "AnalyseModele",
+      "tentative": 1,
+      "secondes": 26.341,
+      "eval_count": 119,
+      "eval_duration_ns": 21357788000,
+      "load_duration_ns": 10998500
+    },
+    {
+      "schema": "BrouillonContraint",
+      "tentative": 1,
+      "secondes": 19.223,
+      "eval_count": 79,
+      "eval_duration_ns": 7998100000,
+      "load_duration_ns": 49380500
+    }
+  ],
+  "sources_sha256": {
+    "agent.py": "89fe36a5cd95368dbc683ef0575f8476e26e96b26037cc26812e1c6268b0da97",
+    "llm.py": "e72f3e5c90ce90e5518194a5434f1128977e33bb0b1f68491d6f2fa0d00a57ee",
+    "schemas.py": "df62eb023c189b1d17acbfa1835abad39182d94bd7907330ec8c117078d2ad16",
+    "prompts.py": "06649d5525c9fa50dfcaac19da99ca7fcd3c01fad39a9a6feee03f69a2930ad0",
+    "redaction.py": "65637e05eb3beea59596e38222516dd25d92b26fc6e0af52ad3fdb243425ed46"
+  },
+  "sources_validation_sha256": {
+    "agent.py": "89fe36a5cd95368dbc683ef0575f8476e26e96b26037cc26812e1c6268b0da97",
+    "llm.py": "e72f3e5c90ce90e5518194a5434f1128977e33bb0b1f68491d6f2fa0d00a57ee",
+    "schemas.py": "ece2dca5c1c5884bf9b6e314cb2790a3fa733f7c5c0e8f3c01cd633af1d01b20",
+    "prompts.py": "06649d5525c9fa50dfcaac19da99ca7fcd3c01fad39a9a6feee03f69a2930ad0",
+    "redaction.py": "65637e05eb3beea59596e38222516dd25d92b26fc6e0af52ad3fdb243425ed46"
+  },
+  "relecture_reponses_reelles": [
+    {
+      "fichier": "email_07.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_08.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_10.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_06.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_02.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_03.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_04.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_05.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_09.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_11.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_12.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_13.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_14.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_15.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_16.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_17.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_18.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_19.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_20.txt",
+      "identique": true
+    },
+    {
+      "fichier": "email_01.txt",
+      "identique": true
     }
   ],
   "entrees_sha256": {
-    "email_01.txt": "f0d211ccaaf9b9a21999bdfdb85b39fbf7707208459ca2f1c7537fc6500bbf5d",
+    "email_07.txt": "768c7c9f5a8c81fa37ff06b0ac8e260e4b420df45c956067498c5c1d2da80a43",
+    "email_08.txt": "3ca658982fd5cb99789eaaae45d715088580ede42223499fd439375a0298ba26",
+    "email_10.txt": "a926665171d887fc9e5d72a1a6fbb9d14c389b282984b8d7f170c92ef6ea55ea",
+    "email_06.txt": "eb45c0c201f848cd21a04a576533dd9be7a4e7b6f917fe30f5640538f68a5472",
     "email_02.txt": "09e8ac378428debd044deeac116ca7ad48440a49e9cb9a7573f903826397ec63",
     "email_03.txt": "33260472367418b6dd1baca0f10c85b83e08d752892c7f387ae46f45b9993758",
     "email_04.txt": "6774b0e61341a3ca21f284255540b44b5762782161fb141868db65dcb3f85b1f",
     "email_05.txt": "877babfd7063382e5c0d89b171fac25efab255b129e16932357c158af2c2be76",
-    "email_06.txt": "eb45c0c201f848cd21a04a576533dd9be7a4e7b6f917fe30f5640538f68a5472",
-    "email_07.txt": "768c7c9f5a8c81fa37ff06b0ac8e260e4b420df45c956067498c5c1d2da80a43",
-    "email_08.txt": "3ca658982fd5cb99789eaaae45d715088580ede42223499fd439375a0298ba26",
     "email_09.txt": "9e7d80b5bdc5b27d0a2565638379e6e5ce44303050703855c18dadf18b635c21",
-    "email_10.txt": "a926665171d887fc9e5d72a1a6fbb9d14c389b282984b8d7f170c92ef6ea55ea",
     "email_11.txt": "15fd27f620cfb8361126aeef61a29ba30b07049c5a7ec0523264cc48f19cdfc0",
     "email_12.txt": "779df7b1b1a631f38f8bddd2d40a221c244becb80433a2f9213a8615befc9941",
     "email_13.txt": "728826094c0e44edcfd19c2baad65e82e8383a9bb8810b56f9c8351dd7c5a5fb",
@@ -346,9 +456,8 @@
     "email_17.txt": "71e6dbff0c3ba7fa633aad965c70df89f5d0f2da41e21c0e2f683d1bd92f5d9d",
     "email_18.txt": "4e813d1c04a00b7b2437f1679b1e8bb87ddb4296646b94da7421f176e704c3d6",
     "email_19.txt": "2e65cdafc2cd8a298d8fe123eb16ce939046647a1559b8ab421af6f5a5c7e0b3",
-    "email_20.txt": "17f892a47915d3f7aaf201fb2518614d944be9b437885af904b11142ea18a4a3"
+    "email_20.txt": "17f892a47915d3f7aaf201fb2518614d944be9b437885af904b11142ea18a4a3",
+    "email_01.txt": "f0d211ccaaf9b9a21999bdfdb85b39fbf7707208459ca2f1c7537fc6500bbf5d"
   },
-  "prompts_sha256": "c725066c1eff5de9c41e990ad1000c01d0e9267b8038c3217211ed793963036a",
-  "redaction_sha256": "65637e05eb3beea59596e38222516dd25d92b26fc6e0af52ad3fdb243425ed46",
   "mode_redaction": "selection_de_formulations_autorisees"
 }

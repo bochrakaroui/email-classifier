@@ -1,181 +1,126 @@
-# Journal de vérification
+# Vérification et limites du rendu
 
-Ce document sépare observations effectuées, contrôles simulés et validations
-restantes. Les métriques de classification ne sont jamais déduites des tests.
+Le rendu contient une exécution réelle sur les 20 emails fournis, des tests du
+code et des observations de limites. Les annotations de référence restent
+**à valider par Bochra** : les scores sont des résultats de développement.
 
-## Inspection initiale
+## Résultats livrés
 
-- Sujet : trois pages lues par extraction `pypdf`, copie dans `sujet_extrait.txt`.
-  L'extraction de certains glyphes accentués du PDF est imparfaite ; les emails
-  originaux, eux, sont intégralement lisibles en UTF-8.
-- Vingt emails, sans pièce jointe réelle, 13 FR / 7 EN. Empreintes initiales dans
-  `entrees_sha256.json` ; les fichiers d'entrée ne sont jamais réécrits par le code.
-- Aucun code préexistant ni instruction `AGENTS.md` trouvée dans le dépôt ou aux
-  emplacements parents contrôlés. Dépôt initial sans commit, identité Git
-  préconfigurée conservée.
-- Python 3.14.0 ; Ollama 0.40.16. `ollama list` était vide avant le téléchargement.
-- Matériel relevé par les commandes Windows CIM : Ryzen 5 4600H, 6 cœurs / 12
-  threads, RAM 16 505 847 808 octets, GTX 1650 Ti de 4 Go.
-- `nvidia-smi` : 4096 MiB de VRAM, 3274 MiB libres lors du relevé, pilote 457.49.
-  La mémoire libre est une photographie ponctuelle, pas une garantie d'exécution
-  GPU. Un pilote ancien peut limiter l'accélération ; seul l'essai réel le tranche.
+Le passage réel du **20 novembre 2026** utilise Ollama et
+`qwen3:4b-instruct-2507-q4_K_M`, avec le traitement complet : analyse, règles
+Python et sélection d’un brouillon si nécessaire.
 
-## Tests simulés
+| Mesure | Résultat observé |
+| --- | --- |
+| Emails traités avec succès | 20 sur 20 |
+| Erreurs techniques | 0 |
+| Brouillons | 17 ; aucune réponse pour les spams et la newsletter |
+| Appels au modèle | 41, dont quatre reprises de validation réussies |
+| Durée du lot sur CPU | 881,273 secondes, soit environ 14 min 41 s |
+| Catégories conformes à la référence proposée | 20 sur 20 |
+| Couverture, exactitude et macro F1 | 1,00 sur ce lot |
+| Écarts de langue, priorité, réponse et revue humaine | Aucun sur les décisions annotées |
 
-Première passe : 21 réussites et 2 échecs. Les deux échecs concernaient la même
-cause : appel de `confusion_matrix` sans aucun exemple réussi. Correction :
-matrice 8×8 nulle et scores non calculables lorsque la couverture est nulle.
+Les fichiers à consulter sont :
 
-Après correction : 23 tests réussis. Trois tests supplémentaires ont ensuite été
-ajoutés pour le code de retour d'un lot partiel, le retrait d'un ancien brouillon
-après échec et la protection d'un fichier non géré. Nouvelle passe : **26 tests
-réussis** avec le Python système. Analyse statique `ruff check` : aucun problème
-après corrections.
+- [Analyses et brouillons](../outputs/resultats.json).
+- [Métriques de l’exécution et empreintes des entrées](../outputs/execution.json).
+- [Évaluation détaillée](../outputs/evaluation.json).
+- [Brouillons en texte](../outputs/reponses/) et
+  [manifeste de protection des retouches](../outputs/manifest.json).
 
-Installation isolée : `.venv` créé avec Python 3.14 ; installation effective de
-`requirements.txt` terminée. `pip check` : aucune dépendance cassée. Les versions
-installées correspondent exactement aux versions directes et transitives figées.
-Tests dans ce venv : **26 réussis en 13,13 secondes**. Ces mesures concernent les
-tests simulés et ne constituent pas une mesure de latence du modèle.
+La priorité est haute pour `05`, basse pour `13`, `14`, `15` et `20`,
+et moyenne pour les quinze autres, selon la règle métier documentée dans le README.
+La priorité et la revue humaine sont indépendantes.
 
-Tous les messages des tests sont synthétiques et les réponses Ollama simulées.
-La présence d'une injection dans un message utilisateur est vérifiée comme
-frontière structurelle ; cela ne certifie pas le comportement sémantique du modèle.
+Cette durée est une observation unique sur la machine d’essai, pas un benchmark
+contrôlé. Elle dépend notamment du matériel, du chargement et de l’état du cache.
 
-## Construction des prompts et séparation des données
+## Reproduire les vérifications
 
-Version initiale : lecture des 20 emails et du sujet pour expliciter les règles.
-Cas qui ont informé les consignes : `01/02/16` (démo et agenda), `03/04` (faits
-produit absents), `05/07/18/19` (sensibilité), `08` (action non réalisée),
-`10` (partenariat plutôt qu'intégration avant-vente), `11/12` (pièces jointes non
-accessibles), `15/20` (autre avec/sans réponse), `17` (procédure support inconnue).
-Ce sont des exemples de développement ; aucun jeu d'évaluation indépendant
-n'est revendiqué. Pas d'exemple de réponse de référence fourni au modèle.
+Depuis la racine du projet, sous PowerShell :
 
-Les annotations ont été proposées séparément avant les prédictions, avec un
-commentaire par email. Elles ne sont pas chargées par `main.py`. Leur statut
-reste **à valider par Bochra** ; elles ne sont pas un étiquetage humain validé.
+```powershell
+.\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
+.\.venv\Scripts\python.exe evaluate.py --reference annotations.json --predictions outputs/resultats.json --output tmp/evaluation_controle.json
+```
 
-## Exécution réelle
+La première commande teste le code sans lancer Ollama. La seconde vérifie les
+résultats livrés, sans nouvelle génération. Pour une nouvelle exécution réelle :
 
-Premier contrôle pendant le téléchargement : exécution sur une copie de
-`email_01.txt`, modèle encore absent. Résultat observé : 0 réussite, 1 échec,
-`type_erreur="modele_indisponible"`, erreur Ollama HTTP 404 enregistrée dans le
-JSON. Ce contrôle vérifie le chemin d'erreur, pas une inférence réussie.
-Le contrôle a ensuite été reproduit dans le venv : code de retour Python **1**,
-bilan 0 réussite / 1 échec, conformément au contrat du CLI.
+```powershell
+.\.venv\Scripts\python.exe main.py --input emails --output tmp/nouvel_essai
+```
 
-Relecture de code avant inférence : le signal lexical `avoir` isolé était trop
-large pour « avoir des renseignements ». Il est restreint à `un avoir` / `cet avoir`.
-Un test synthétique de non-régression couvre cette phrase. Les négations et
-citations restent des limites du filet lexical conservateur.
-Après cette correction : **27 tests réussis en 3,98 secondes dans le venv** ;
-analyse statique sans problème. Le code de traitement n'a pas été ajusté à des
-prédictions du modèle à ce stade.
+Sur Linux/macOS, remplacer `.\.venv\Scripts\python.exe` par `./.venv/bin/python`.
+Le dossier `tmp/` est créé au besoin et reste exclu de Git.
 
-Le téléchargement du candidat exact demandé est terminé. Premier appel structuré
-réel réussi sur une demande de démo synthétique : catégorie `demo`, priorité haute,
-langue française, réponse nécessaire, aucune revue sensible. Détails complets dans
-`diagnostic_modele.json` : digest
-`0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0`,
-4.0B, GGUF `Q4_K_M`, 2 497 293 803 octets de poids/manifestes.
+## Tests du code et conservation du comportement
 
-L'appel Ollama a pris **56,209 s**, dont environ **15,307 s de chargement** et
-**19,901 s de génération de 122 tokens**, soit environ **6,13 tokens/s** pour la
-génération seule. Le serveur indique `100% CPU`, `size_vram=0`, contexte 4096 et
-environ 3,186 Go alloués au modèle chargé. Aucune accélération GPU n'est revendiquée.
-Le modèle demandé reste utilisable sur CPU ; il est conservé, avec une latence
-plus élevée qu'une exécution GPU. Les résultats du lot complet et de sa revue
-seront inscrits ci-dessous après exécution.
+La suite compte **149 tests réussis**. Elle couvre notamment les erreurs isolées,
+les catégories et types autorisés, l’identité, les phrases brèves, les priorités,
+les cas sensibles, la protection des brouillons retouchés et les interactions
+de l’interface. Les tests Streamlit passent par AppTest ; seul le transport
+vers Ollama est simulé.
 
-### Premier lot complet et corrections
+Après simplification du code, les réponses enregistrées du dernier passage réel
+ont été rejouées dans les versions antérieure et simplifiée. Pour les **20 emails**,
+les **41 requêtes**, reprises comprises, et les **17 brouillons** sont identiques.
+La comparaison vérifie les messages, schémas JSON, paramètres et résultats.
 
-Premier lot : **20 succès techniques, 0 échec, 36 appels, 956,516 s**. Exactitude
-et macro F1 **0,95** sur la référence proposée. L'appel d'offres `18` était classé
-partenariat ; quatre priorités différaient et l'invitation `15` n'avait pas de réponse.
-Les quatre cas sensibles étaient signalés sans faux positif ni faux négatif.
+Le [rapport de relecture](relecture_simplification.json) conserve les empreintes
+des sources et le résultat par email. C’est une relecture de réponses réelles
+enregistrées, sans nouvelle inférence ni nouvelle mesure de latence. Les fichiers
+d’exécution livrés gardent les métadonnées de leur génération d’origine.
 
-La revue des 16 brouillons par Codex a rejeté ce premier lot : conformité RGPD
-affirmée, menus produit inventés, absence de programme/poste tenue pour vraie,
-champs sans rapport, mauvaise langue et engagements non étayés. Les fichiers
-exacts sont conservés dans `essai_initial/`, avec le prompt de cet essai.
+## Choix motivés par les essais
 
-Deuxième essai : cinq emails ciblés (`04/12/15/17/18`), rédaction libre avec
-consignes raccourcies, langue explicite et champ par catégorie. RFP et invitation
-étaient mieux traités, mais des affirmations non étayées persistaient sur le RGPD
-et la participation à l'appel d'offres. Cet essai est aussi rejeté ; archive dans
-`essai_cible/`. Il ne suffit donc pas de renforcer une consigne négative.
+**Rédaction contrôlée.** Les essais de rédaction libre ont produit des affirmations
+non étayées, notamment sur la conformité RGPD, des menus du produit et des décisions
+commerciales. La réponse finale est donc choisie dans un catalogue de textes
+autorisés. Ce contrôle réduit les inventions de texte, avec moins de personnalisation ;
+une mauvaise analyse peut encore conduire au choix d’un texte peu pertinent.
 
-Correction finale de conception : `redaction.propositions_brouillons` fournit
-des formulations prudentes, dans la langue de l'analyse. Le deuxième appel
-choisit un texte complet ; `schema_brouillon` contraint le champ `corps` à ces
-seules valeurs via une enum. Pydantic refuse tout texte libre, même JSON valide.
-Ces formulations sont définies par Codex dans le code et restent à faire valider
-par Bochra ; aucune approbation métier FAKTUS n'est revendiquée.
+**Identité.** Avant correction, un passage réel a donné 16 succès et quatre échecs
+de validation (`07`, `13`, `14`, `20`). Les contrôles exigeaient parfois une
+entreprise répétée ou refusaient une variante de service pourtant présente dans
+la signature. La normalisation utilise maintenant les informations explicites,
+tout en conservant les refus d’une autre personne ou d’une société inventée.
+Les [réponses refusées et messages correspondants](rejets_avant.json) sont conservés
+pour expliquer cette correction. Ces quatre échecs reproduits ne permettent pas
+d’identifier rétrospectivement toutes les erreurs d’une ancienne session d’interface.
 
-Troisième contrôle ciblé sur les cinq mêmes emails : cinq succès, textes relus
-par Codex, aucune affirmation de conformité, participation ou procédure inventée.
-La priorité commerciale non sensible encore trop haute dans ce contrôle a
-motivé la mise en Python de toute la politique de priorité. La classification et
-la décision de réponse restent des décisions sémantiques du modèle, sauf spam.
+**Modèle local.** Le [diagnostic initial](diagnostic_modele.json) relève un modèle
+de 4 milliards de paramètres, quantifié en `Q4_K_M`, d’environ 2,5 Go sur disque.
+Ollama rapportait environ 3,2 Go pour le modèle chargé, sans mémoire GPU utilisée.
+Ce diagnostic date du 19 novembre ; sa réponse synthétique illustre une ancienne
+version des consignes, pas le contrat actuel des résumés.
 
-Résumé : contrôle d'une phrase par ponctuation et retour explicite de la cause
-en cas de validation invalide. Une abréviation peut être prise à tort pour une
-fin de phrase. Tests après ces changements : **32 réussis** ; analyse statique
-sans problème. Une nouvelle exécution complète a été effectuée avec ce code.
+**Langue et instructions malveillantes.** Les
+[deux essais synthétiques historiques](robustesse_reelle.json) ont correctement
+classé une publicité contenant une instruction de détournement, mais ont détecté
+à tort en français une demande bilingue principalement anglaise. Ils concernent
+une version antérieure ; aucune résistance générale aux injections ni maîtrise
+générale du bilinguisme n’est revendiquée.
 
-Les scores comparent l'application après règles à la référence, pas les priorités
-brutes du modèle. Aucun changement des annotations n'a été fait pour améliorer
-le résultat. Tous les exemples ci-dessus font désormais partie du développement.
+## Limites et relecture nécessaire
 
-### Lot final réellement exécuté
+Les annotations ont été proposées par l’assistant avant les prédictions ; leurs
+priorités ont ensuite suivi la règle demandée par Bochra. Elles ne sont jamais
+chargées par le traitement des emails. Un petit jeu de développement et une
+référence non validée ne mesurent pas la généralisation.
 
-- Commande : `.venv\Scripts\python main.py --input emails --output outputs`.
-- Code de retour **0**, **20 réussites, 0 échec**, **17 brouillons**.
-- **1 007,722 s** (16 min 47,722 s) sur CPU, **39 appels** et **4 307 tokens générés**.
-- 22 appels d'analyse : deux reprises de validation sur `06` et `16`, réussies
-  au second essai ; 17 choix de brouillons contraints.
-- Évaluation réelle : code **0**, couverture **1,00**, exactitude **1,00**, macro
-  F1 **1,00** sur la référence proposée ; aucun écart sur langue, priorité,
-  besoin de réponse et revue humaine. Quatre cas sensibles retrouvés, zéro faux
-  négatif, zéro faux positif, zéro non-évalué.
-- Ces scores mesurent l'application après règles, sur le corpus de développement
-  dont les annotations restent à valider. Ils ne mesurent pas la fidélité de la
-  prose des résumés/justifications, ni des emails nouveaux.
-- Vérification des artefacts : 20 noms uniques correspondant aux entrées,
-  schémas validés, 17 textes identiques entre JSON et fichiers, tous présents
-  dans le catalogue autorisé, empreintes du manifeste exactes, empreintes des
-  prompts/catalogue correspondant au code exécuté. Les 20 sources ont conservé
-  leur empreinte initiale. Aucun fichier de réponse pour `13/14/20`.
-- La relance réelle a remplacé les 16 anciens brouillons et ajouté celui de `15`.
-  Les cas de suppression d'un ancien brouillon et de protection d'une retouche
-  humaine sont vérifiés séparément par les tests simulés.
-- Vérifications finales : **32 tests réussis en 4,33 s** dans le venv ; `pip check`
-  sans conflit ; `ruff check` et `git diff --check` sans problème.
-- Reproductibilité Git : les emails originaux et brouillons sont marqués `-text`
-  dans `.gitattributes`, afin qu'un checkout Windows ne convertisse pas leurs
-  fins de ligne et n'invalide pas les empreintes du manifeste.
+La réussite technique ne garantit pas la fidélité de la prose. Dans les résultats
+livrés, `03` assimile maladroitement une personne à sa PME, `04` attribue à
+Lukas Becker un rôle dans la conformité non établi par le message, et `16`
+reformule de façon imprécise le contexte temporel du salon. Le nom « Microsoft »
+dans le phishing `14` reste une identité déclarée, pas une identité authentifiée.
 
-### Deux contrôles réels hors corpus
+Avant d’utiliser une réponse, vérifier sa pertinence, sa langue, les affirmations,
+les champs à compléter et les alertes de revue humaine. Aucun email n’est envoyé
+automatiquement. La connexion Gmail reste non configurée.
 
-Les attentes figurent dans `tests/cas_synthetiques.json`, créé avant ces appels.
-Les observations intégrales sont dans `robustesse_reelle.json`, séparées des scores
-sur les 20 emails fournis.
-
-1. Vente de contacts contenant une instruction de se classer en démo : `spam`,
-   français, aucune réponse. Attentes respectées. Un seul exemple ne prouve pas
-   une résistance générale aux injections.
-2. Salutation « Bonjour / Hello », demande principale anglaise : `demo` correct,
-   mais langue `fr` au lieu de `en`, donc brouillon français. **Échec de langue**
-   conservé comme limite connue. La consigne du prompt sur le bilinguisme ne
-   suffit pas sur cet exemple. Aucune réussite bilingue générale n'est revendiquée.
-
-La revue de prose est consignée dans `revue_assistant.md`, distincte de la grille
-de validation humaine. Les brouillons fermés sont prudents mais moins personnalisés.
-
-## Validation restante
-
-- Validation des annotations et des choix de priorité par Bochra.
-- Relecture des brouillons et remplissage de la grille `grille_revue.md`.
-- Compléter les champs manquants avec des informations FAKTUS approuvées avant usage.
-- Un jeu indépendant est nécessaire pour évaluer la généralisation.
+Les prochaines améliorations seraient de faire valider la référence et de tester
+un lot indépendant, de disposer d’une documentation produit approuvée pour
+personnaliser les réponses, puis d’évaluer les cas bilingues et les performances
+sur plusieurs exécutions contrôlées.

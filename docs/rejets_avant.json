@@ -1,0 +1,132 @@
+{
+  "modele": "qwen3:4b-instruct-2507-q4_K_M",
+  "sources_sha256": {
+    "agent.py": "89fe36a5cd95368dbc683ef0575f8476e26e96b26037cc26812e1c6268b0da97",
+    "llm.py": "e72f3e5c90ce90e5518194a5434f1128977e33bb0b1f68491d6f2fa0d00a57ee",
+    "schemas.py": "c633719af53dc026e72ae385bcd88466d95938109b25561aa10a78180043b825",
+    "prompts.py": "4cbae823c3c9b3f67bc38f1d747864d287a83445bbe91dab8c1e81742c6d01ba",
+    "redaction.py": "65637e05eb3beea59596e38222516dd25d92b26fc6e0af52ad3fdb243425ed46"
+  },
+  "reussites": 16,
+  "erreurs": 4,
+  "secondes": 942.67,
+  "appels": 42,
+  "cas": [
+    {
+      "fichier": "email_07.txt",
+      "code": "sortie_invalide",
+      "message": "AnalyseModele invalide après 2 essais : Value error, resume doit commencer exactement par « Comptabilité Fournisseurs de Groupe Altis » puis un verbe, sans fonction ni titre",
+      "reponses_brutes": [
+        {
+          "a_valider_par_humain": false,
+          "cas_sensibles": [],
+          "categorie": "facturation",
+          "entreprise_expediteur": "Groupe Altis",
+          "justification": "Service comptabilité – Groupe Altis signale un écart de montant sur une facture, demandant une explication ou un avoir.",
+          "langue": "fr",
+          "priorite": "moyenne",
+          "reponse_necessaire": true,
+          "resume": "Service comptabilité – Groupe Altis demande une explication ou un avoir pour l'écart de montant sur la facture n°FK-2026-1042."
+        },
+        {
+          "a_valider_par_humain": false,
+          "cas_sensibles": [],
+          "categorie": "facturation",
+          "entreprise_expediteur": "Groupe Altis",
+          "justification": "Comptabilité Fournisseurs signale un écart de montant sur une facture, demandant une explication ou un avoir.",
+          "langue": "fr",
+          "priorite": "moyenne",
+          "reponse_necessaire": true,
+          "resume": "Comptabilité Fournisseurs demande une explication ou un avoir pour l'écart de montant sur la facture n°FK-2026-1042."
+        }
+      ]
+    },
+    {
+      "fichier": "email_13.txt",
+      "code": "sortie_invalide",
+      "message": "AnalyseModele invalide après 2 essais : Value error, resume doit commencer exactement par « Growth Hacking Pro de Growth Hacking Pro » puis un verbe, sans fonction ni titre",
+      "reponses_brutes": [
+        {
+          "a_valider_par_humain": false,
+          "cas_sensibles": [],
+          "categorie": "spam",
+          "entreprise_expediteur": "Growth Hacking Pro",
+          "justification": "L'expéditeur Growth Hacking Pro propose une offre de leads avec un prix bas et une durée limitée, caractéristique d'un contenu publicitaire non sollicité.",
+          "langue": "fr",
+          "priorite": "basse",
+          "reponse_necessaire": false,
+          "resume": "Growth Hacking Pro propose une offre de 10 000 leads B2B pour 99€, valable 24h, via un lien de redirection."
+        },
+        {
+          "a_valider_par_humain": false,
+          "cas_sensibles": [],
+          "categorie": "spam",
+          "entreprise_expediteur": "Growth Hacking Pro",
+          "justification": "Growth Hacking Pro propose une offre de 10 000 leads B2B pour 99€, valable 24h, via un lien de redirection.",
+          "langue": "fr",
+          "priorite": "basse",
+          "reponse_necessaire": false,
+          "resume": "Growth Hacking Pro propose une offre de 10 000 leads B2B pour 99€, valable 24h, via un lien de redirection."
+        }
+      ]
+    },
+    {
+      "fichier": "email_14.txt",
+      "code": "sortie_invalide",
+      "message": "AnalyseModele invalide après 2 essais : Value error, resume doit commencer exactement par « Security Team de Microsoft » puis un verbe, sans fonction ni titre",
+      "reponses_brutes": [
+        {
+          "a_valider_par_humain": false,
+          "cas_sensibles": [],
+          "categorie": "spam",
+          "entreprise_expediteur": "Microsoft",
+          "justification": "L'expéditeur Microsoft signale un lien de vérification suspect dans un email non sollicité.",
+          "langue": "en",
+          "priorite": "basse",
+          "reponse_necessaire": false,
+          "resume": "Microsoft signale un lien de vérification suspect dans un email non sollicité."
+        },
+        {
+          "a_valider_par_humain": false,
+          "cas_sensibles": [],
+          "categorie": "spam",
+          "entreprise_expediteur": "Microsoft",
+          "justification": "Security Team signale un lien de vérification suspect dans un email non sollicité.",
+          "langue": "en",
+          "priorite": "basse",
+          "reponse_necessaire": false,
+          "resume": "Security Team signale un lien de vérification suspect dans un email non sollicité."
+        }
+      ]
+    },
+    {
+      "fichier": "email_20.txt",
+      "code": "sortie_invalide",
+      "message": "AnalyseModele invalide après 2 essais : Value error, resume doit commencer exactement par « Newsletter Fintech Weekly de Fintech Weekly » puis un verbe, sans fonction ni titre",
+      "reponses_brutes": [
+        {
+          "a_valider_par_humain": false,
+          "cas_sensibles": [],
+          "categorie": "autre",
+          "entreprise_expediteur": "Fintech Weekly",
+          "justification": "L'équipe Fintech Weekly signale une newsletter sur les levées de fonds fintech",
+          "langue": "fr",
+          "priorite": "basse",
+          "reponse_necessaire": true,
+          "resume": "L'équipe Fintech Weekly souhaite partager une newsletter sur les levées de fonds fintech"
+        },
+        {
+          "a_valider_par_humain": false,
+          "cas_sensibles": [],
+          "categorie": "autre",
+          "entreprise_expediteur": "Fintech Weekly",
+          "justification": "Newsletter Fintech Weekly signale une newsletter sur les levées de fonds fintech",
+          "langue": "fr",
+          "priorite": "basse",
+          "reponse_necessaire": true,
+          "resume": "Newsletter Fintech Weekly souhaite partager une newsletter sur les levées de fonds fintech"
+        }
+      ]
+    }
+  ]
+}

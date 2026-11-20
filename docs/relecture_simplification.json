@@ -1,0 +1,163 @@
+{
+  "mode": "relecture_de_reponses_reelles_sans_nouvelle_inference",
+  "origine_reponses": "Passage reel du 20 novembre 2026, apres correction des erreurs",
+  "nouvelle_mesure_latence": false,
+  "tests": {
+    "avant": {
+      "reussis": 149,
+      "secondes": 16.7
+    },
+    "apres": {
+      "reussis": 149,
+      "secondes": 17.32
+    }
+  },
+  "modeles_messages_schemas_parametres_identiques": true,
+  "emails": 20,
+  "appels": 41,
+  "brouillons": 17,
+  "sources_avant_sha256": {
+    "agent.py": "68c326195cd491d5a4f27da9e2e470a2d3f9e15d6b113ef92700063b67c31d4a",
+    "app.py": "95b0f6ea874bb3402dd7ef62d4a1df97a2916a2a3c2c600ab47fe033d8c8f54d",
+    "diagnostics.py": "bf18903a2b4abaa0c1e43b97661bf9e35004b0667ec56e467bb3b243286abdd9",
+    "evaluate.py": "0d5baa9daccf7e0ea447fd2b0dddb584bde1705b343e22091da9de4cba98560a",
+    "llm.py": "7fb595faf0b8d719248e5ef03e736e3711750ba7e32bf86a58ef85499f9c3446",
+    "main.py": "5016aa601ce46378b1aed626d54437685a1cb021f73131ce0a70ed403f3c666a",
+    "prompts.py": "06649d5525c9fa50dfcaac19da99ca7fcd3c01fad39a9a6feee03f69a2930ad0",
+    "redaction.py": "8150f07e1c1795eb50b81d809e3f7f1844e2469df2572a828e35471436e93d67",
+    "schemas.py": "648188dd0bbd59aa26f33271bda5c0ed1588a9829ebeeb6cbbcc507577cf42ef"
+  },
+  "sources_apres_sha256": {
+    "agent.py": "89fe36a5cd95368dbc683ef0575f8476e26e96b26037cc26812e1c6268b0da97",
+    "app.py": "1a13babed421504a32f87ccd31532182cc65cf8cd715c68978cd428629744528",
+    "diagnostics.py": "08c4442e5a5e951f0a252c9457c65032c549e283326201dc9ef436447d476c30",
+    "evaluate.py": "f62812be13f280ed161b832eef08fe873f0ca772adf154e7d9aa031b381a2ba8",
+    "llm.py": "0c9a7a89b62b41c01cad18db87b4b8652ef9bb635905dd64b1bda4af0aa3805b",
+    "main.py": "cd73972af9b14896b42ed48ee280d8be16212839e592f091d20521c4484f14d8",
+    "prompts.py": "06649d5525c9fa50dfcaac19da99ca7fcd3c01fad39a9a6feee03f69a2930ad0",
+    "redaction.py": "c12920269a0d31e572d8006dcb9a4862a22c31d0b21911accb3cb992e3efbc2b",
+    "schemas.py": "c32655fe126e8ca13a10c0ce41a01b37ea11bc05bf052e3aee7db8beaf80c215"
+  },
+  "verifications": [
+    {
+      "fichier": "email_07.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_08.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 3
+    },
+    {
+      "fichier": "email_10.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_06.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_02.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_03.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_04.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_05.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 3
+    },
+    {
+      "fichier": "email_09.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_11.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_12.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_13.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 1
+    },
+    {
+      "fichier": "email_14.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_15.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_16.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_17.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_18.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 3
+    },
+    {
+      "fichier": "email_19.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    },
+    {
+      "fichier": "email_20.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 1
+    },
+    {
+      "fichier": "email_01.txt",
+      "requetes_identiques": true,
+      "resultat_identique": true,
+      "appels": 2
+    }
+  ]
+}
