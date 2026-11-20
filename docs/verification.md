@@ -57,7 +57,7 @@ Le dossier `tmp/` est créé au besoin et reste exclu de Git.
 
 ## Tests du code et conservation du comportement
 
-La suite compte **149 tests réussis**. Elle couvre notamment les erreurs isolées,
+La suite compte **156 tests réussis**. Elle couvre notamment les erreurs isolées,
 les catégories et types autorisés, l’identité, les phrases brèves, les priorités,
 les cas sensibles, la protection des brouillons retouchés et les interactions
 de l’interface. Les tests Streamlit passent par AppTest ; seul le transport
@@ -72,6 +72,58 @@ Le [rapport de relecture](relecture_simplification.json) conserve les empreintes
 des sources et le résultat par email. C’est une relecture de réponses réelles
 enregistrées, sans nouvelle inférence ni nouvelle mesure de latence. Les fichiers
 d’exécution livrés gardent les métadonnées de leur génération d’origine.
+
+### Reprise d’un lot interrompu dans l’interface
+
+Un test a reproduit le symptôme « 5 traités, 0 erreur » : une relance automatique
+du script au sixième email interrompait la boucle déclenchée par le bouton, et
+la liste restante n’était pas mémorisée. Les journaux Ollama de la session
+signalée montrent des réponses HTTP 200 ; les anciens rapports ne contenaient
+que les erreurs, sans progression. Le déclencheur exact de la relance automatique
+sur la machine n’a pas été identifié.
+
+Le lot et sa progression sont maintenant conservés dans la session. Le résultat
+et le retrait de l’email de la file sont enregistrés avant tout nouvel affichage.
+`runner.fastReruns=false` évite le lancement concurrent d’une nouvelle exécution
+pendant cette sauvegarde. Les compteurs sont actualisés après chaque email ;
+le suivi apparaît au-dessus du tableau. Un bouton permet d’arrêter explicitement
+le lot, et le journal local conserve l’état, l’email courant et les fichiers restants.
+Cette reprise concerne la même session ; elle ne remplace pas une sauvegarde
+persistante des corrections après arrêt du serveur.
+
+Lors de cette première correction : **153 tests réussis en 20,72 s**, dont quatre nouveaux tests :
+relance au sixième email, relance demandée pendant un appel sans retraitement
+d’un email terminé, conservation d’une erreur sans réessai automatique et arrêt
+explicite du lot. Les tests existants de corrections humaines restent réussis.
+
+Les 20 fichiers réels ont aussi été rejoués dans AppTest avec les réponses
+enregistrées : **20 succès, 0 erreur, 17 brouillons, 41 requêtes identiques**,
+avec une relance au sixième email et aucun email retraité. Ce contrôle ne fait
+pas de nouvel appel au modèle. Le backend d’analyse et de rédaction est inchangé ;
+le [rapport de reprise](reprise_interface.json) conserve le détail et les empreintes
+de la nouvelle interface. Le rapport de simplification précédent décrit la
+version antérieure de l’interface.
+
+### Consultation des résultats et sauvegarde des corrections
+
+Deux scénarios supplémentaires ont été reproduits avant correction : le callback
+du brouillon levait le `KeyError` signalé lorsque sa clé de widget avait disparu ;
+le rejeu d’un ancien déclencheur « Réanalyser » lançait une nouvelle analyse sans
+nouveau clic. Le test simule ce rejeu avec le mécanisme de relance de Streamlit ;
+il ne constitue pas une capture des événements exacts du navigateur de Bochra.
+
+La sauvegarde ignore désormais une valeur de champ absente et conserve la dernière
+correction enregistrée ; une chaîne vide reste une correction valide. Les trois
+boutons d’analyse créent leur lot dans `on_click`. Leur valeur de retour lors d’un
+réaffichage ne déclenche plus de traitement. Ce choix suit le
+[fonctionnement des callbacks Streamlit](https://docs.streamlit.io/develop/concepts/architecture/widget-behavior#order-of-operations).
+
+Les trois nouveaux tests couvrent ces deux scénarios et la consultation des 20
+résultats, avec édition puis retour au premier email : aucun appel supplémentaire,
+aucune remise à zéro du lot et corrections conservées. Les tests de réanalyse
+explicite et de reprise des lots restent réussis. La suite complète passe :
+**156 tests réussis en 23,36 s**. Le rapport de reprise est
+actualisé avec le contrôle de consultation sur les 20 emails réels rejoués.
 
 ## Choix motivés par les essais
 

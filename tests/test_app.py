@@ -96,6 +96,114 @@ def test_selection_corrections_et_telechargement_sans_nouvel_appel(monkeypatch):
     assert at.button("analyser").disabled
 
 
+def test_consulter_les_vingt_resultats_et_corriger_sans_reanalyse(monkeypatch):
+    from copy import deepcopy
+
+    client, constructions = simulation(
+        monkeypatch, *[r for _ in range(20) for r in (analyse(), BROUILLON_AUTORISE)],
+    )
+    at = ouvrir()
+    charger(at, *(fichier(f"email_{n:02}.txt") for n in range(1, 21)))
+    at.button("analyser").click().run()
+    resultats_avant = deepcopy(at.session_state["resultats"])
+    lot_avant = deepcopy(at.session_state["lot"])
+    identifiants = list(at.session_state["emails"])
+    premier = identifiants[0]
+    correction = "Brouillon corrigé avant de consulter un autre email."
+    # Une édition non encore envoyée et la sélection partent dans la même interaction.
+    at.text_area(f"edition_{premier}").set_value(correction)
+    for identifiant in identifiants[1:] + [premier]:
+        at.selectbox("choix_email").select(identifiant).run()
+        assert not at.exception
+        assert at.metric[1].value == "20" and at.metric[2].value == "0"
+        assert at.session_state["resultats"] == resultats_avant
+        assert at.session_state["lot"] == lot_avant
+        assert len(client.appels) == 40 and len(constructions) == 1
+    assert at.text_area(f"edition_{premier}").value == correction
+    # Effacer volontairement le texte est aussi une correction à conserver.
+    at.text_area(f"edition_{premier}").set_value("")
+    at.selectbox("choix_email").select(identifiants[1]).run()
+    at.selectbox("choix_email").select(premier).run()
+    assert not at.exception and at.text_area(f"edition_{premier}").value == ""
+    assert len(client.appels) == 40 and len(constructions) == 1
+
+
+def test_callback_editeur_disparu_preserve_correction_et_resultats(monkeypatch):
+    client, _ = simulation(monkeypatch, analyse(), BROUILLON_AUTORISE, analyse(), BROUILLON_AUTORISE)
+    editeur = st.text_area
+    retirer = []
+
+    def editeur_avec_callback_retarde(*args, **kwargs):
+        if kwargs.get("key", "").startswith("edition_"):
+            callback = kwargs["on_change"]
+
+            def apres_retrait(identifiant, cle_widget):
+                if retirer:
+                    # Le callback arrive alors que la clé de l'ancien champ a disparu.
+                    st.session_state.pop(cle_widget, None)
+                callback(identifiant, cle_widget)
+
+            kwargs["on_change"] = apres_retrait
+        return editeur(*args, **kwargs)
+
+    monkeypatch.setattr(st, "text_area", editeur_avec_callback_retarde)
+    at = ouvrir()
+    charger(at, fichier("a.txt"), fichier("b.txt"))
+    at.button("analyser").click().run()
+    premier, second = list(at.session_state["emails"])
+    correction = "Correction déjà enregistrée à conserver."
+    at.text_area(f"edition_{premier}").set_value(correction).run()
+    retirer.append(True)
+    at.text_area(f"edition_{premier}").set_value("Événement tardif sans valeur récupérable")
+    at.selectbox("choix_email").select(second).run()
+    assert not at.exception
+    assert at.session_state["corrections"][premier] == correction
+    at.selectbox("choix_email").select(premier).run()
+    assert not at.exception
+    assert at.text_area(f"edition_{premier}").value == correction
+    assert at.metric[1].value == "2" and len(client.appels) == 4
+
+
+def test_rejeu_ancien_clic_de_reanalyse_ne_relance_pas_le_modele(monkeypatch):
+    from streamlit.proto.WidgetStates_pb2 import WidgetStates
+    from streamlit.runtime.scriptrunner import get_script_run_ctx
+    from streamlit.runtime.scriptrunner_utils.script_requests import RerunData
+
+    client, constructions = simulation(
+        monkeypatch, *[r for _ in range(3) for r in (analyse(), BROUILLON_AUTORISE)],
+    )
+    at = ouvrir()
+    charger(at, fichier("a.txt"), fichier("b.txt"))
+    at.button("analyser").click().run()
+    at.button("reanalyser").click().run()  # Une vraie réanalyse reste autorisée.
+    assert len(client.appels) == 6
+    bouton_id = at.button("reanalyser").id
+    selecteur = st.selectbox
+    relances = []
+
+    def selection_avec_rejeu(*args, **kwargs):
+        valeur = selecteur(*args, **kwargs)
+        if kwargs.get("key") == "choix_email" and not relances:
+            relances.append(True)
+            etats = WidgetStates()
+            etats.widgets.add(id=bouton_id, trigger_value=True)
+            # Streamlit peut restituer un déclencheur déjà consommé sans rappeler
+            # son callback. Le réaffichage ne constitue pas un nouveau clic.
+            get_script_run_ctx().script_requests.request_rerun(
+                RerunData(replay_trigger_states=etats),
+            )
+        return valeur
+
+    monkeypatch.setattr(st, "selectbox", selection_avec_rejeu)
+    second = list(at.session_state["emails"])[1]
+    at.selectbox("choix_email").select(second).run()
+    assert not at.exception
+    assert len(client.appels) == 6 and len(constructions) == 2
+    assert at.session_state["lot"]["etat"] == "termine"
+    assert at.session_state["lot"]["restants"] == []
+    assert at.metric[1].value == "2"
+
+
 def test_homonymes_distincts_et_doublon_strict(monkeypatch):
     client, _ = simulation(monkeypatch)
     at = ouvrir()
@@ -430,3 +538,119 @@ def test_echec_journal_local_ne_bloque_pas_le_traitement(monkeypatch):
     assert not at.exception and len(client.appels) == 2
     assert any("rapport local n’a pas pu être enregistré" in w.value for w in at.warning)
     assert at.session_state["resultats"][at.selectbox("choix_email").value]["statut"] == "succes"
+
+
+def test_lot_de_vingt_reprend_apres_relance_du_script_au_sixieme_email(monkeypatch):
+    import agent
+
+    traiter = agent.traiter_email
+    relances = []
+
+    def traiter_avec_relance(texte, nom, llm):
+        # Simuler une relance automatique, sans clic utilisateur ni erreur Ollama.
+        if nom == "email_06.txt" and not relances:
+            relances.append(nom)
+            st.rerun()
+        return traiter(texte, nom, llm)
+
+    monkeypatch.setattr(agent, "traiter_email", traiter_avec_relance)
+    client, _ = simulation(monkeypatch, *[r for _ in range(20) for r in (analyse(), BROUILLON_AUTORISE)])
+    at = ouvrir()
+    charger(at, *(fichier(f"email_{n:02}.txt") for n in range(1, 21)))
+    at.button("analyser").click().run()
+    assert not at.exception
+    resultats = at.session_state["resultats"]
+    assert len(resultats) == 20
+    assert all(r["statut"] == "succes" for r in resultats.values())
+    assert len(client.appels) == 40
+    assert at.metric[1].value == "20"
+
+
+def test_relance_demandee_pendant_appel_ne_retraite_pas_email_termine(monkeypatch, tmp_path):
+    import agent
+    from streamlit.runtime.scriptrunner import get_script_run_ctx
+    from streamlit.runtime.scriptrunner_utils.script_requests import RerunData
+
+    traiter = agent.traiter_email
+    relances = []
+
+    def traiter_avec_relance(texte, nom, llm):
+        resultat = traiter(texte, nom, llm)
+        if nom == "email_06.txt" and not relances:
+            relances.append(nom)
+            # La relance est prise au prochain appel Streamlit, après le retour du LLM.
+            get_script_run_ctx().script_requests.request_rerun(RerunData())
+        return resultat
+
+    monkeypatch.setattr(agent, "traiter_email", traiter_avec_relance)
+    client, _ = simulation(monkeypatch, *[r for _ in range(20) for r in (analyse(), BROUILLON_AUTORISE)])
+    at = ouvrir()
+    charger(at, *(fichier(f"email_{n:02}.txt") for n in range(1, 21)))
+    at.button("analyser").click().run()
+    assert not at.exception
+    assert len(at.session_state["resultats"]) == 20
+    assert len(client.appels) == 40  # Aucun appel supplémentaire pour le sixième email.
+    rapport = json.loads(next((tmp_path / "diagnostics").glob("*.json")).read_text(encoding="utf-8"))
+    assert rapport["traitement"]["etat"] == "termine"
+    assert rapport["traitement"]["termines"] == rapport["traitement"]["total"] == 20
+    assert rapport["traitement"]["courant"] is None
+    assert rapport["traitement"]["restants"] == []
+
+
+def test_erreur_avant_relance_reste_visible_sans_reessai_automatique(monkeypatch):
+    import agent
+
+    traiter = agent.traiter_email
+    relances = []
+
+    def traiter_avec_relance(texte, nom, llm):
+        if nom == "email_06.txt" and not relances:
+            relances.append(nom)
+            st.rerun()
+        return traiter(texte, nom, llm)
+
+    monkeypatch.setattr(agent, "traiter_email", traiter_avec_relance)
+    client, _ = simulation(monkeypatch, ConnectionError("indisponible"),
+                           *[r for _ in range(19) for r in (analyse(), BROUILLON_AUTORISE)])
+    at = ouvrir()
+    charger(at, *(fichier(f"email_{n:02}.txt") for n in range(1, 21)))
+    at.button("analyser").click().run()
+    assert not at.exception
+    assert len(at.session_state["resultats"]) == 20
+    assert at.metric[1].value == "19" and at.metric[2].value == "1"
+    assert len(client.appels) == 39
+    assert not at.button("reessayer_erreurs").disabled
+    assert any("Ollama inaccessible" in e.value for e in at.error)
+
+
+def test_arret_explicite_annule_la_reprise_automatique(monkeypatch):
+    import agent
+
+    traiter = agent.traiter_email
+    bouton = st.button
+    relances = []
+
+    def traiter_avec_relance(texte, nom, llm):
+        if nom == "email_06.txt" and not relances:
+            relances.append(nom)
+            st.rerun()
+        return traiter(texte, nom, llm)
+
+    def bouton_arret(*args, **kwargs):
+        clic = bouton(*args, **kwargs)
+        if kwargs.get("key") == "arreter_lot" and relances:
+            return True  # Simuler le clic d'arrêt à la reprise de la page.
+        return clic
+
+    monkeypatch.setattr(agent, "traiter_email", traiter_avec_relance)
+    monkeypatch.setattr(st, "button", bouton_arret)
+    client, _ = simulation(monkeypatch, *[r for _ in range(5) for r in (analyse(), BROUILLON_AUTORISE)])
+    at = ouvrir()
+    charger(at, *(fichier(f"email_{n:02}.txt") for n in range(1, 21)))
+    at.button("analyser").click().run()
+    assert not at.exception
+    assert len(at.session_state["resultats"]) == 5 and len(client.appels) == 10
+    assert at.session_state["lot"]["etat"] == "arrete"
+    assert at.session_state["lot"]["restants"] == []
+    at.run()
+    assert not at.exception and len(client.appels) == 10

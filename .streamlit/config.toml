@@ -11,3 +11,7 @@ address = "127.0.0.1"
 
 [browser]
 gatherUsageStats = false
+
+[runner]
+# Terminer la sauvegarde de l'email courant avant une relance de la page.
+fastReruns = false

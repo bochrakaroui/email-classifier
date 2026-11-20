@@ -1,0 +1,55 @@
+{
+  "mode": "AppTest avec reponses reelles enregistrees, sans nouvel appel reseau",
+  "reproduction_avant_correction": {
+    "emails_traites": 5,
+    "erreurs": 0,
+    "relance_simulee_au_sixieme_email": true
+  },
+  "apres_correction": {
+    "emails_traites": 20,
+    "erreurs": 0,
+    "brouillons": 17,
+    "appels_rejoues": 41,
+    "resultats_identiques": true,
+    "requetes_identiques": true,
+    "emails_retraites": 0,
+    "journal_final": {
+      "etat": "termine",
+      "total": 20,
+      "termines": 20,
+      "echecs": 0,
+      "courant": null,
+      "restants": [],
+      "messages_erreurs": []
+    }
+  },
+  "consultation_apres_traitement": {
+    "emails_consultes": 20,
+    "appels_supplementaires": 0,
+    "correction_conservee": true,
+    "resultats_inchanges": true,
+    "lot_termine_sans_redemarrage": true
+  },
+  "declencheur_exact_de_la_relance_sur_la_machine": "non determine",
+  "sources_ui_sha256": {
+    "app.py": "f03ea5da15a7f5acd22a08c6e734cdbd14c6a1b09679309ae3bf266fc45dd0a6",
+    "diagnostics.py": "425b453990f96b7f650b83202d5007bec40d2c4eae58dbee0512a46f2010fc3b",
+    ".streamlit/config.toml": "8d64c37341d751fae0dac26819254941db3b8c8c8abac52f02a3009d71551c93"
+  },
+  "sources_backend_sha256": {
+    "agent.py": "89fe36a5cd95368dbc683ef0575f8476e26e96b26037cc26812e1c6268b0da97",
+    "llm.py": "0c9a7a89b62b41c01cad18db87b4b8652ef9bb635905dd64b1bda4af0aa3805b",
+    "prompts.py": "06649d5525c9fa50dfcaac19da99ca7fcd3c01fad39a9a6feee03f69a2930ad0",
+    "schemas.py": "c32655fe126e8ca13a10c0ce41a01b37ea11bc05bf052e3aee7db8beaf80c215",
+    "redaction.py": "c12920269a0d31e572d8006dcb9a4862a22c31d0b21911accb3cb992e3efbc2b"
+  },
+  "tests": {
+    "reussis": 156,
+    "secondes": 23.36
+  },
+  "reproduction_consultation_avant_correction": {
+    "callback_sans_cle_widget": "KeyError reproduit dans AppTest",
+    "rejeu_ancien_declencheur_reanalyse": "Nouvel appel indu reproduit dans AppTest",
+    "evenements_exacts_du_navigateur_captures": false
+  }
+}

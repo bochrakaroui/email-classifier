@@ -84,6 +84,16 @@ Dans l’interface :
 3. Sélectionner un email pour consulter son texte, son analyse et son brouillon.
 4. Relire, corriger et télécharger la réponse.
 
+Changer l’email à consulter affiche les résultats mémorisés, sans nouvel appel
+au modèle. Seul un clic sur un bouton d’analyse demande un nouveau traitement.
+Les corrections restent associées à leur email quand la sélection change.
+
+Le suivi s’affiche au-dessus du tableau et les compteurs avancent après chaque
+email. Le lot demandé reste en mémoire et reprend après une relance automatique
+du script dans la même session. **Arrêter le lot** annule les emails restants ;
+une demande d’arrêt est prise en compte après l’email en cours. Une actualisation
+complète du navigateur ou un arrêt du serveur peut perdre l’état de session.
+
 **Télécharger les corrections avant de quitter** : elles restent dans la session
 du navigateur et ne sont pas sauvegardées dans `outputs/`.
 La connexion Gmail n’est pas configurée ; utiliser les fichiers locaux.
@@ -289,7 +299,7 @@ Elle mesure notamment les catégories correctes, les erreurs techniques et les
 
 Dernière vérification réelle, le **20 novembre 2026** :
 **20 emails traités, 0 erreur technique, 17 brouillons**, en environ **14 min 41 s
-sur CPU**. La suite de tests du code compte **149 tests réussis**.
+sur CPU**. La suite de tests du code compte **156 tests réussis**.
 Les résultats livrés sont dans [outputs/](outputs/). Le
 [bilan de vérification](docs/verification.md) décrit les essais et leurs limites.
 
@@ -327,12 +337,14 @@ signalés pour une revue humaine ; tous les champs à compléter doivent être r
 | Délai dépassé en ligne de commande | Ajouter `--timeout 300` si la machine a besoin de plus de temps. Le délai par défaut est de 180 secondes **par appel**, pas pour tout le lot. |
 | Email marqué « Erreur » | Ouvrir **Détail des erreurs**, puis **Réessayer les erreurs** pour un échec récupérable. Corriger et recharger un fichier vide, trop long ou mal encodé. |
 | Résultat marqué « À actualiser » | Les règles ont changé depuis son analyse ; cliquer sur **Analyser les emails** ou **Réanalyser cet email**. |
+| Plusieurs emails traités, puis plus de progression | Le lot reprend après une relance du script dans la même session. Le suivi indique l’email courant et le journal local conserve les noms des emails restants. Après mise à jour de l’application, redémarrer Streamlit pour charger sa configuration. |
 | Brouillon modifié qui bloque une relance CLI | Conserver sa version corrigée ailleurs ou choisir un nouveau dossier de sortie. La commande protège les retouches manuelles. |
 
 En cas de réponse JSON invalide, le programme demande une correction au modèle,
 avec **deux tentatives maximum**. Une erreur est signalée si les deux échouent.
 Les erreurs réseau ne sont pas réessayées automatiquement.
 Les diagnostics de l’interface sont enregistrés dans `tmp/diagnostics_interface/`.
+Ils conservent aussi l’état du lot, le nombre d’emails terminés et l’email courant.
 
 ## 7. Repères dans le projet
 
